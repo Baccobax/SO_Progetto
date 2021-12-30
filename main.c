@@ -29,6 +29,8 @@ void main()
             NavicellaGiocatore(tubo[1]);
 
         default: /* processo padre */
+        {
+            /*
             for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicella: il numero di navicelle dipende dalla macro NEMICI
             {
                 pidNem[i] = fork();
@@ -41,20 +43,22 @@ void main()
                     case 0: //Processo singola Navicella nemica
                     {
                         close(tubo[0]);
-                        NavicellaNemica(tubo[1]);
+                        //NavicellaNemica(tubo[1]);
                         break;
                     }
-                    default: /*Processo padre pt.2, il mio "main" in pratica*/
+                    default: /*Processo padre pt.2, il mio "main" in pratica
                     {
-                        close(tubo[1]);
-                        collision(tubo[0]);
+                        
                     }
                 }
-            }
+            }*/
+            close(tubo[1]);
+            collision(tubo[0]);
+        
          kill(pidNav , 1);
          /* ipotetico ciclo per uccidere le navicelle*/
          endwin();
-         exit(666);  
+         exit(666);  }
     }
     exit(0);  
 }
