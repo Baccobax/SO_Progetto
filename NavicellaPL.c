@@ -1,15 +1,15 @@
 #include "SubroutinesSO.h"
 
-void NavicellaGiocatore(int pipeout)
+void NavicellaGiocatore(int pipeout , int pidPro)
 {
-    int MAXY , MAXX;
+    int MAXY , MAXX, i = 0 , a , dyG , dyS;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
-    pos pos_Navicella;
-    pos_Navicella.c = '>';
-    pos_Navicella.x = 1;
-    pos_Navicella.y = MAXY/2;
-    write(pipeout , &pos_Navicella , sizeof(pos_Navicella));
+    pos pos_navicella, pos_proiettile;
+    pos_navicella.c = '>';
+    pos_navicella.x = 1;
+    pos_navicella.y = MAXY/2;
+    write(pipeout , &pos_navicella , sizeof(pos_navicella));
     while(true)
     {
         while(true)
@@ -18,15 +18,15 @@ void NavicellaGiocatore(int pipeout)
             switch(c)
             {
                 case KEY_UP:
-                    if(pos_Navicella.y > 2)
+                    if(pos_navicella.y > 2)
                     {
-                        pos_Navicella.y -= 1;
+                        pos_navicella.y -= 1;
                     }
                     break;
                 case KEY_DOWN:
-                    if(pos_Navicella.y < MAXY-2)
+                    if(pos_navicella.y < MAXY-2)
                     {
-                        pos_Navicella.y += 1;
+                        pos_navicella.y += 1;
                         break;
                     }
                 default:
@@ -34,46 +34,87 @@ void NavicellaGiocatore(int pipeout)
                     break;                
                 }
             }
-            write(pipeout , &pos_Navicella , sizeof(pos_Navicella));
+            write(pipeout , &pos_navicella , sizeof(pos_navicella));
+                
+                        // generazione di un singolo processo proiettile
+                        pidPro = fork();
+
+                        switch(pidPro)
+                        {
+                            case -1:
+                                perror("fork call");
+                                _exit(2);
+                                break;
+
+                            case 0:
+                                if(a == 'x')//Processo Proiettile
+                                {
+                                    pos_proiettile.x = pos_navicella.x + 1;
+                                    pos_proiettile.y = pos_navicella.y;
+                                    pos_proiettile.c = '+';
+                                    write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
+                                    while(i < MAXX)
+                                    {
+                                        i++;
+                                        usleep(5000);
+                                        pos_proiettile.x++; 
+                                        write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
+                                    }
+                                    exit(EXIT_SUCCESS);
+                                }
+                            default:
+                                a = getch();
+                                wait(NULL);
+                                break;
+                        }
+                    
         }
-        Proiettili(getch() , pos_Navicella , pipeout);
     }
 
 }
 
-
-int Proiettili(char a , pos pos_Navicella , int pipeout)
+/*
+int Proiettili(pos pos_navicella, int pipeout)
 {
     pos pos_proiettile , pos_proiettileGIU , pos_proiettileSU;
-    int i , maxX , maxY , dyG , dyS;
+    int i, a , maxX , maxY , dyG , dyS;
     getmaxyx(stdscr , maxY ,maxX);
-    
+
     switch(a)
     {
         case 'x':
         {
-            pos_proiettile.x = pos_Navicella.x + 1;
-            pos_proiettile.y = pos_Navicella.y;
+            pos_proiettile.x = pos_navicella.x + 1;
+            pos_proiettile.y = pos_navicella.y;
             pos_proiettile.c = '+';
             write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
             for(i = 0 ; i < maxX , i++;)
             {
                 pos_proiettile.x++; 
+                write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
+                /* se il proiettile va oltre killa il processo
+                if (pos_proiettile.x >= maxX)
+                    kill(pidPro);
+                    
             }
+            exit(EXIT_SUCCESS);
             break;
         }
         case 'X':
         {
-            pos_proiettile.x = pos_Navicella.x + 1;
-            pos_proiettile.y = pos_Navicella.y;
+            pos_proiettile.x = pos_navicella.x + 1;
+            pos_proiettile.y = pos_navicella.y;
             pos_proiettile.c = '+';
             write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
             for(i = 0 ; i < maxX , i++;)
             {
                 pos_proiettile.x++; 
+                write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
             }
+            exit(EXIT_SUCCESS);
             break;
         }
+        /*
         case ' ':
         {
             pos_proiettileGIU.x = pos_Navicella.x + 1;
@@ -88,7 +129,7 @@ int Proiettili(char a , pos pos_Navicella , int pipeout)
             
             while(pos_proiettileGIU.x != maxX && pos_proiettileSU.x != maxX)
             {
-                /*Proiettile che parte andando verso*/
+                Proiettile che parte andando verso
                 if(pos_proiettileGIU.y + dyG < 0) //se va oltre, rimetti a posto
                 {
                     pos_proiettileGIU.y = 0;
@@ -117,7 +158,7 @@ int Proiettili(char a , pos pos_Navicella , int pipeout)
                     }
                 }
                 write(pipeout , &pos_proiettileGIU , sizeof(pos_proiettileGIU));
-                /*Proiettile che parte andando verso l'alto*/
+                Proiettile che parte andando verso l'alto
                 if(pos_proiettileSU.y + dyS < 0) //se va oltre, rimetti a posto
                 {
                     pos_proiettileSU.y = 0;
@@ -146,10 +187,10 @@ int Proiettili(char a , pos pos_Navicella , int pipeout)
                     }
                 }
                 write(pipeout , &pos_proiettileSU , sizeof(pos_proiettileSU));
-            }     
-        }
+            }
+         
     }
-}
+}/*
 
 /*momentaneamente ficchiamo la funzione qua per testing*/
 
@@ -170,13 +211,15 @@ void collision(int pipein)
             }
             Nav = valore_letto;
         }
-        else
+        else if(valore_letto.c == '+')
         {
-            if(proiettile.x >= 0)
             {
-                mvaddch(proiettile.y , proiettile.x , ' ');
+                if(proiettile.x >= 0)
+                {
+                    mvaddch(proiettile.y, proiettile.x, ' ');
+                }
+                proiettile = valore_letto;
             }
-            proiettile = valore_letto;
         }
         mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
         curs_set(false);
