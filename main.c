@@ -15,21 +15,22 @@ void main()
         perror("pipe call");
         _exit(1);
     }
-
+    
+    perror("diocane 1");
     pidNav = fork();
-
     switch(pidNav)
     {
         case -1:
-            perror("fork call");
-            _exit(2);
+            {
+                perror("fork call");
+                _exit(2);
+            }
 
         case 0: /*Processo Navicella*/
             close(tubo[0]);
             NavicellaGiocatore(tubo[1] , pidPro);
 
         default: /* processo padre */
-        {
             /*
             pidPro = fork();
 
@@ -78,7 +79,6 @@ void main()
          /* ipotetico ciclo per uccidere le navicelle*/
          endwin();
          exit(666);  
-         }
     }
     exit(0);  
 }
