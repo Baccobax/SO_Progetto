@@ -10,13 +10,15 @@ void main()
     noecho();
     curs_set(false);
 
+    wrefresh(stdscr);
+
     if(pipe(tubo) == -1) //pipe fallisce
     {
         perror("pipe call");
         _exit(1);
     }
     
-    perror("diocane 1");
+    //perror("diocane 1");
     pidNav = fork();
     switch(pidNav)
     {
@@ -28,7 +30,7 @@ void main()
 
         case 0: /*Processo Navicella*/
             close(tubo[0]);
-            NavicellaGiocatore(tubo[1] , pidPro);
+            NavicellaGiocatore(tubo[1] , pidPro, stdscr);
 
         default: /* processo padre */
             /*

@@ -49,7 +49,7 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                     pos_proiettile.x = pos_navicella.x + 1;
                                     pos_proiettile.y = pos_navicella.y;
                                     write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
-                                    while(pos_proiettile.x < MAXX)
+                                    while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
                                     {
                                         usleep(50000);
                                         pos_proiettile.x++; 
@@ -166,6 +166,10 @@ void collision(int pipein)
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto;
     Nav.x = -1;
     proiettile.x =- 1;
+
+    border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
+    wrefresh(stdscr);
+
     do
     {
         read(pipein, &valore_letto, sizeof(valore_letto));
@@ -188,6 +192,6 @@ void collision(int pipein)
         }
         mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
         curs_set(false);
-        refresh();
+        wrefresh(stdscr);
     } while(true);
 }
