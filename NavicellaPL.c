@@ -52,9 +52,10 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                     while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
                                     {
                                         usleep(50000);
-                                        pos_proiettile.x++; 
+                                        pos_proiettile.x++;
                                         write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                                     }
+                                    usleep(50000);
                                     exit(EXIT_SUCCESS);
                                     kill(pidPro , 1);
                                 }
@@ -164,34 +165,45 @@ int Proiettili(pos pos_navicella, int pipeout)
 void collision(int pipein)
 {
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto;
+    int MAXY , MAXX;
+    getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
     proiettile.x =- 1;
 
+
     border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
-    wrefresh(stdscr);
+    refresh();
 
     do
     {
         read(pipein, &valore_letto, sizeof(valore_letto));
-        if(valore_letto.c == '>')
+        switch(valore_letto.c)
         {
+            case('>'):
+            {
 
-            if(Nav.x >= 0)
-                {
-                    mvaddch(Nav.y, Nav.x , ' ');
-                }
-            Nav = valore_letto;
+                if(Nav.x >= 0)
+                    {
+                        mvaddch(Nav.y, Nav.x , ' ');
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                    }
+                Nav = valore_letto;
+            }
+            case('+'):
+            {
+                if(valore_letto.x >= 3)
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x-1, ' ');
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                    }
+                if(valore_letto.x >= MAXX-2)
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x , ' ');                    
+                    }
+                //proiettile = valore_letto;
+            }
         }
-        else if(valore_letto.c == '+')
-        {
-            if(valore_letto.x >= 3)
-                {
-                    mvaddch(valore_letto.y , valore_letto.x-1, ' ');
-                }
-            //proiettile = valore_letto;
-        }
-        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
         curs_set(false);
-        wrefresh(stdscr);
+        refresh();
     } while(true);
 }
