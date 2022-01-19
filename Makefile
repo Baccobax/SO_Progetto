@@ -1,11 +1,14 @@
-sobaka: main.o NavicellaPL.o
-	cc main.o NavicellaPL.o -lncurses -o sobaka 
+sobaka: main.o SubroutinesSO.o Navicelle.o
+	cc main.o SubroutinesSO.o Navicelle.o -lncurses -o sobaka 
 
-main.o: NavicellaPL.o SubroutinesSO.h
+main.o: Navicelle.o SubroutinesSO.h
 	cc -c main.c SubroutinesSO.h
 
-NavicellaPL.o: NavicellaPL.c SubroutinesSO.h
-	cc -c NavicellaPL.c
+Navicelle.o: Navicelle.c SubroutinesSO.h
+	cc -c Navicelle.c
+
+SubroutinesSO.o: SubroutinesSO.c SubroutinesSO.h
+	cc -c SubroutinesSO.c
 
 clean:
 	rm *.o

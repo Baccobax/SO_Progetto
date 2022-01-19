@@ -17,6 +17,9 @@ int y; /* coordinata y */
 }pos;
 
 //void NavicellaNemica(int pipeout);
+void Start();
 void NavicellaGiocatore();
-int Proiettili();
+//int Proiettili();
 void collision();
+//void Vittoria();
+//void GameOver();
