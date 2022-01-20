@@ -9,11 +9,11 @@ void Start()
 
     char menu[2][18] = {"Inizia partita", "Esci dal gioco"};
     char benvenuto[11][80] = {
-    " ____                                  _   _                                 ",
-    "| __ )  ___ _ ____   _____ _ __  _   _| |_(_)  ___ _   _                     ",
-    "|  _ \\ / _ \\ '_ \\ \\ / / _ \\ '_ \\| | | | __| | / __| | | |              ",
-    "| |_) |  __/ | | \\ V /  __/ | | | |_| | |_| | \\__ \\ |_| |                 ",
-    "|____/ \\___|_| |_|\\_/ \\___|_| |_|\\__,_|\\__|_| |___/\\__,_|              ",
+    "       ____                                  _   _                           ",
+    "      | __ )  ___ _ ____   _____ _ __  _   _| |_(_)  ___ _   _               ",
+    "      |  _ \\ / _ \\ '_ \\ \\ / / _ \\ '_ \\| | | | __| | / __| | | |        ",
+    "      | |_) |  __/ | | \\ V /  __/ | | | |_| | |_| | \\__ \\ |_| |           ",
+    "      |____/ \\___|_| |_|\\_/ \\___|_| |_|\\__,_|\\__|_| |___/\\__,_|        ",
     " ____                         ___                     _                      ",
     "/ ___| _ __   __ _  ___ ___  |_ _|_ ____   ____ _  __| | ___ _ __ ___        ",
     "\\___ \\| '_ \\ / _` |/ __/ _ \\  | || '_ \\ \\ / / _` |/ _` |/ _ \\ '__/ __|",
@@ -42,7 +42,11 @@ void Start()
     {
         //sprintf(item2, "%-79s", benvenuto[i]);
         mvwprintw( w1, g+1, (MAXX/2) - 40, "%s", benvenuto[g]); //la scritta verra' centrata sullo schermo a partire da altezza y=1
-    }        
+        usleep(100000);
+        wrefresh(w1);
+    }
+
+    usleep(500000);        
 
     //STAMPA LA PRIMA VOLTA IL MENU
     for ( i = 0; i < 2; i++)
@@ -52,7 +56,7 @@ void Start()
         else
             wattroff( w1, A_STANDOUT); // l'altro è "spento"
             //sprintf(item, "%-17s", menu[i]);
-            mvwprintw( w1, i+2+(MAXY/2), 2, "%s", menu[i]);
+            mvwprintw( w1, i+2+(MAXY/2), (MAXX/2) - 9, "%s", menu[i]);
     }
     wrefresh( w1 );
     i = 0;
@@ -63,7 +67,7 @@ void Start()
     while ((ch = wgetch(w1)) != 'q' && flag1 != false) //premendo q skippo tutto e parte il gioco
     {
         //sprintf(item, "%-17s", menu[i]);
-        mvwprintw( w1, i+2+(MAXY/2), 2, "%s", menu[i]);
+        mvwprintw( w1, i+2+(MAXY/2), (MAXX/2) - 9, "%s", menu[i]);
 
         switch (ch)
         {
@@ -94,9 +98,10 @@ void Start()
         }
         wattron( w1 , A_STANDOUT );
         //sprintf(item, "%-17s", menu[i]);
-        mvwprintw( w1, i+2+(MAXY/2), 2, "%s", menu[i]);
+        mvwprintw( w1, i+2+(MAXY/2), (MAXX/2) - 9, "%s", menu[i]);
         wattroff( w1, A_STANDOUT );       
     }
+    wrefresh(w1);
     delwin(w1);
     endwin(); 
     
