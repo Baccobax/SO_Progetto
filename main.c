@@ -6,7 +6,10 @@ void main()
     int tubo[2];
     int i = 0 , pidNav, pidPro;
     
-    Start();
+    //Start();
+    initscr();
+    noecho();
+    curs_set(false);
 
     refresh();
 
@@ -72,8 +75,8 @@ void main()
                     }
                 }
             } */
-        close(tubo[1]);
-        collision(tubo[0]);
+            close(tubo[1]);
+            collision(tubo[0]);
         
          kill(pidNav , 1);
          /* ipotetico ciclo per uccidere le navicelle*/
