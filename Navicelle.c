@@ -1,8 +1,8 @@
 #include "SubroutinesSO.h"
 
-void NavicellaGiocatore(int pipeout , int pidPro)
+void NavicellaGiocatore(int pipeout)
 {
-    int MAXY , MAXX , c , dyG = MOVIMENTO , dyS = -MOVIMENTO , pidProS , pidProG;
+    int MAXY , MAXX , c , dyG = MOVIMENTO , dyS = -MOVIMENTO , pidPro[10] , pidProS[10] , pidProG[10] , status , i = 0 , g = 0 , s = 0 ;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
     pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su;
@@ -13,7 +13,9 @@ void NavicellaGiocatore(int pipeout , int pidPro)
     pos_proiettile_giu.c = '\\';
     pos_proiettile_su.c = '/';
     write(pipeout , &pos_navicella , sizeof(pos_navicella));
-    
+
+    InizializzazioneArrayPid(pidPro , pidProG , pidProS);
+
     while(true)
     {
         c = getch();
@@ -21,13 +23,14 @@ void NavicellaGiocatore(int pipeout , int pidPro)
         {
             case KEY_UP:
                 if(pos_navicella.y > 2)
+
                 {
                     pos_navicella.y -= 1;
                     write(pipeout , &pos_navicella , sizeof(pos_navicella));
                     break;
                 }        
             case KEY_DOWN:
-                if(pos_navicella.y < MAXY-2)
+                if(pos_navicella.y < MAXY-3)
                 {
                     pos_navicella.y += 1;
                     write(pipeout , &pos_navicella , sizeof(pos_navicella));
@@ -35,19 +38,18 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                 }
             case 'x':
                 {
-                    pidPro = fork();
-                    switch(pidPro)
+                    i++;
+                    pidPro[i] = fork();
+                    switch(pidPro[i])
                     {
                         case -1:
                             perror("fork call");
-                            _exit(2);
+                            _exit(2);\
                             break;
 
                         case 0:
                             //Processo Proiettile
                             {
-                                //mvprintw(10 , 10 , "%d , %d" , pos_navicella.x , pos_navicella.y);
-                                refresh();
                                 pos_proiettile.x = pos_navicella.x + 1;
                                 pos_proiettile.y = pos_navicella.y;
                                 write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
@@ -56,59 +58,39 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                     usleep(50000);
                                     pos_proiettile.x++;
                                     write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
-                                    //mvprintw(20 , 20 , "%d , %d" , pos_proiettile.x , pos_proiettile.y);
-                                    refresh();
                                 }
                                 usleep(50000);
-                                exit(EXIT_SUCCESS);
-                                kill(pidPro , 1);
+                                _exit(SIGUSR1);
                             }
-                        default:
-                            break;
-                    }
+                        }
                     break;
                 }
             case ' ':
                 {
-                    //mvprintw(20,20, "AAAAAAAAH");
-                    pidProG = fork(); //Proiettile di giù
-                    int a = getpid();
-                    if(getpid() == 0)
-                    {
-                        mvprintw(20 , 20 , "processo figlio");
-                        refresh();
-                    }
-                    else
-                    {
-                        mvprintw(25 , 20 , "processo padre");
-                        refresh();
-                    }
-                    refresh();
-                    switch(pidProG)
+                    g++;
+                    pidProG[g] = fork(); //Proiettile di giù
+                    switch(pidProG[g])
                     {
                         case -1:
                                 perror("fork call");
                                 _exit(2);
                                 break;
                         case 0:
-                            {   mvprintw(25 , 20 , "%d , %d" , pos_navicella.x , pos_navicella.y);
-                                refresh();
+                            {
                                 pos_proiettile_giu.x = pos_navicella.x + 1;
                                 pos_proiettile_giu.y = pos_navicella.y + 1;
                                 write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
-                                //mvprintw(25 , 20 , "%d , %d" , pos_proiettile_giu.x , pos_proiettile_giu.y);
-                                refresh();
                                 while(pos_proiettile_giu.x < MAXX - 2)
                                 {
-                                    if(pos_proiettile_giu.y <= 2) 
+                                    if(pos_proiettile_giu.y < 2) 
                                     {
                                         dyG = MOVIMENTO;
-                                        pos_proiettile_giu.c = '/';
+                                        pos_proiettile_giu.c = '\\';
                                     }
                                     if(pos_proiettile_giu.y >= MAXY - 2)
                                     {
                                         dyG = -MOVIMENTO;
-                                        pos_proiettile_giu.c = '\\';
+                                        pos_proiettile_giu.c = '/';
                                     }
                                     usleep(50000);
                                     pos_proiettile_giu.y += dyG;
@@ -116,12 +98,13 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                     write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
                                 }
                                 usleep(50000);
-                                exit(EXIT_SUCCESS);
+                                _exit(SIGUSR1);
                             }
                         default: //Proiettile di su 
                             {   
-                                pidProS = fork();
-                                switch(pidProS)
+                                s++;
+                                pidProS[s] = fork();
+                                switch(pidProS[s])
                                 {
                                     case -1:
                                         perror("fork call");
@@ -129,11 +112,9 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                         break;
                                     case 0:
                                     {
-                                        //mvprintw(10 , 10 , "%d , %d" , pos_proiettile.x , pos_proiettile.y);
                                         pos_proiettile_su.x = pos_navicella.x + 1;
                                         pos_proiettile_su.y = pos_navicella.y - 1;
                                         write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
-                                        refresh();
                                         while(pos_proiettile_su.x < MAXX - 2)
                                         {
                                             if(pos_proiettile_su.y < 2) 
@@ -150,31 +131,53 @@ void NavicellaGiocatore(int pipeout , int pidPro)
                                             pos_proiettile_su.y += dyS;
                                             pos_proiettile_su.x++;
                                             write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
-                                            //mvprintw(20 , 20 , "%d , %d" , pos_proiettile_su.x , pos_proiettile_su.y);
-                                            refresh();
                                         }
                                         usleep(50000);
-                                        exit(EXIT_SUCCESS);
-                                        kill(pidProS , 1);
-                                        break;
+                                        _exit(SIGUSR1);
                                     }
-                                    default:
-                                        break;
                                 }
                                 break;
                             }
                     }
-                    kill(pidProG , 1);
-                    break;
                 }
-            default:
-                {
-                    break;
-                }
+        }
+        i = 0;
+        g = 0;
+        s = 0;
+        while(i < 10 && g < 10 && s < 10)
+        {
+            if(pidPro[i] != UNDEFINED)
+            {
+                waitpid(pidPro[i] , &status , WNOHANG);
             }
+            if(pidProG[g] != UNDEFINED)
+            {
+                waitpid(pidPro[i] , &status , WNOHANG);    
+            }
+            if(pidProS[s] != UNDEFINED)
+            {
+                waitpid(pidProS[s] , &status , WNOHANG);   
+            }
+            i++;
+            g++;
+            s++;
+        }
+        i = 0;
+        g = 0;
+        s = 0;
     }
 }
 
+void InizializzazioneArrayPid(int *PrimoPid , int *SecondoPid , int *TerzoPid)
+{
+    int i;
+    for(i = 0 ; i < 10 ; i++)
+    {
+        PrimoPid[i] = UNDEFINED;
+        SecondoPid[i] = UNDEFINED;
+        TerzoPid[i] = UNDEFINED;
+    }
+}
 
 /*momentaneamente ficchiamo la funzione qua per testing*/
 
@@ -249,4 +252,5 @@ void collision(int pipein)
         curs_set(false);
         refresh();
     } while(true);
+    refresh();
 }

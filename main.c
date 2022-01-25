@@ -4,7 +4,7 @@
 void main() 
 {
     int tubo[2];
-    int i = 0 , pidNav, pidPro;
+    int i = 0 , pidNav , status = 0;
     
     //Start();
     initscr();
@@ -19,7 +19,6 @@ void main()
         _exit(1);
     }
     
-    //perror("diocane 1");
     pidNav = fork();
     switch(pidNav)
     {
@@ -31,7 +30,8 @@ void main()
 
         case 0: /*Processo Navicella*/
             close(tubo[0]);
-            NavicellaGiocatore(tubo[1] , pidPro, stdscr);
+            NavicellaGiocatore(tubo[1]);
+            _exit(SIGUSR1);
 
         default: /* processo padre */
             /*
@@ -77,11 +77,9 @@ void main()
             } */
             close(tubo[1]);
             collision(tubo[0]);
-        
-         kill(pidNav , 1);
-         /* ipotetico ciclo per uccidere le navicelle*/
-         endwin();
-         exit(666);  
+            /* ipotetico ciclo per uccidere le navicelle*/
     }
+    while(wait(0) > 0);
+    endwin();
     exit(0);  
 }
