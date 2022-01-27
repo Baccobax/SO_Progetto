@@ -2,7 +2,8 @@
 
 void NavicellaGiocatore(int pipeout)
 {
-    int MAXY , MAXX , c , dyG = MOVIMENTO , dyS = -MOVIMENTO , pidPro[10] , pidProS[10] , pidProG[10] , status , i = 0 , g = 0 , s = 0 ;
+    int MAXY , MAXX , c , dyG = MOVIMENTO , dyS = -MOVIMENTO , pidPro , pidProS , pidProG , statusPRO = 0 , statusPROS = 0 , statusPROG = 0;
+    bool i = false , j = false;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
     pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su;
@@ -13,8 +14,6 @@ void NavicellaGiocatore(int pipeout)
     pos_proiettile_giu.c = '\\';
     pos_proiettile_su.c = '/';
     write(pipeout , &pos_navicella , sizeof(pos_navicella));
-
-    InizializzazioneArrayPid(pidPro , pidProG , pidProS);
 
     while(true)
     {
@@ -38,146 +37,136 @@ void NavicellaGiocatore(int pipeout)
                 }
             case 'x':
                 {
-                    i++;
-                    pidPro[i] = fork();
-                    switch(pidPro[i])
+                    if(i == false)
                     {
-                        case -1:
-                            perror("fork call");
-                            _exit(2);\
-                            break;
-
-                        case 0:
-                            //Processo Proiettile
-                            {
-                                pos_proiettile.x = pos_navicella.x + 1;
-                                pos_proiettile.y = pos_navicella.y;
-                                write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
-                                while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
-                                {
-                                    usleep(50000);
-                                    pos_proiettile.x++;
-                                    write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
-                                }
-                                usleep(50000);
-                                _exit(SIGUSR1);
-                            }
-                        }
-                    break;
-                }
-            case ' ':
-                {
-                    g++;
-                    pidProG[g] = fork(); //Proiettile di giù
-                    switch(pidProG[g])
-                    {
-                        case -1:
+                        i = true;
+                        pidPro = fork();
+                        switch(pidPro)
+                        {
+                            case -1:
                                 perror("fork call");
                                 _exit(2);
                                 break;
-                        case 0:
-                            {
-                                pos_proiettile_giu.x = pos_navicella.x + 1;
-                                pos_proiettile_giu.y = pos_navicella.y + 1;
-                                write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
-                                while(pos_proiettile_giu.x < MAXX - 2)
+
+                            case 0:
+                                //Processo Proiettile
                                 {
-                                    if(pos_proiettile_giu.y < 2) 
+                                    pos_proiettile.x = pos_navicella.x + 1;
+                                    pos_proiettile.y = pos_navicella.y;
+                                    write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
+                                    while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
                                     {
-                                        dyG = MOVIMENTO;
-                                        pos_proiettile_giu.c = '\\';
-                                    }
-                                    if(pos_proiettile_giu.y >= MAXY - 2)
-                                    {
-                                        dyG = -MOVIMENTO;
-                                        pos_proiettile_giu.c = '/';
+                                        usleep(50000);
+                                        pos_proiettile.x++;
+                                        write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                                     }
                                     usleep(50000);
-                                    pos_proiettile_giu.y += dyG;
-                                    pos_proiettile_giu.x++;
-                                    write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
+                                    _exit(SIGUSR1);
                                 }
-                                usleep(50000);
-                                _exit(SIGUSR1);
-                            }
-                        default: //Proiettile di su 
-                            {   
-                                s++;
-                                pidProS[s] = fork();
-                                switch(pidProS[s])
+                        }
+                    }
+                }
+                    break;
+            case ' ':
+                {
+                    if(j == false)
+                    {
+                        j = true;
+                        pidProG = fork(); //Proiettile di giù
+                        switch(pidProG)
+                        {
+                            case -1:
+                                    perror("fork call");
+                                    _exit(2);
+                                    break;
+                            case 0:
                                 {
-                                    case -1:
-                                        perror("fork call");
-                                        _exit(2);
-                                        break;
-                                    case 0:
+                                    pos_proiettile_giu.x = pos_navicella.x + 1;
+                                    pos_proiettile_giu.y = pos_navicella.y + 1;
+                                    write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
+                                    while(pos_proiettile_giu.x < MAXX - 2)
                                     {
-                                        pos_proiettile_su.x = pos_navicella.x + 1;
-                                        pos_proiettile_su.y = pos_navicella.y - 1;
-                                        write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
-                                        while(pos_proiettile_su.x < MAXX - 2)
+                                        if(pos_proiettile_giu.y < 2) 
                                         {
-                                            if(pos_proiettile_su.y < 2) 
+                                            dyG = MOVIMENTO;
+                                            pos_proiettile_giu.c = '\\';
+                                        }
+                                        if(pos_proiettile_giu.y >= MAXY - 2)
+                                        {
+                                            dyG = -MOVIMENTO;
+                                            pos_proiettile_giu.c = '/';
+                                        }
+                                        usleep(43000);
+                                        pos_proiettile_giu.y += dyG;
+                                        pos_proiettile_giu.x++;
+                                        write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
+                                    }
+                                    usleep(50000);
+                                    _exit(SIGUSR2);
+                                }
+                            default: //Proiettile di su 
+                                {   
+                                    pidProS = fork();
+                                    switch(pidProS)
+                                    {
+                                        case -1:
+                                            perror("fork call");
+                                            _exit(2);
+                                            break;
+                                        case 0:
+                                        {
+                                            pos_proiettile_su.x = pos_navicella.x + 1;
+                                            pos_proiettile_su.y = pos_navicella.y - 1;
+                                            write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
+                                            while(pos_proiettile_su.x < MAXX - 2)
                                             {
-                                                dyS = MOVIMENTO;
-                                                pos_proiettile_su.c = '\\';
-                                            }
-                                            if(pos_proiettile_su.y >= MAXY - 2)
-                                            {
-                                                dyS = -MOVIMENTO;
-                                                pos_proiettile_su.c = '/';
+                                                if(pos_proiettile_su.y < 2) 
+                                                {
+                                                    dyS = MOVIMENTO;
+                                                    pos_proiettile_su.c = '\\';
+                                                }
+                                                if(pos_proiettile_su.y >= MAXY - 2)
+                                                {
+                                                    dyS = -MOVIMENTO;
+                                                    pos_proiettile_su.c = '/';
+                                                }
+                                                usleep(43000);
+                                                pos_proiettile_su.y += dyS;
+                                                pos_proiettile_su.x++;
+                                                write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
                                             }
                                             usleep(50000);
-                                            pos_proiettile_su.y += dyS;
-                                            pos_proiettile_su.x++;
-                                            write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
+                                            _exit(SIGUSR2);
                                         }
-                                        usleep(50000);
-                                        _exit(SIGUSR1);
                                     }
+                                    break;
                                 }
-                                break;
                             }
                     }
                 }
         }
-        i = 0;
-        g = 0;
-        s = 0;
-        while(i < 10 && g < 10 && s < 10)
+
+        waitpid(pidPro , &statusPRO , WNOHANG);
+        if(statusPRO != 0)
         {
-            if(pidPro[i] != UNDEFINED)
-            {
-                waitpid(pidPro[i] , &status , WNOHANG);
-            }
-            if(pidProG[g] != UNDEFINED)
-            {
-                waitpid(pidPro[i] , &status , WNOHANG);    
-            }
-            if(pidProS[s] != UNDEFINED)
-            {
-                waitpid(pidProS[s] , &status , WNOHANG);   
-            }
-            i++;
-            g++;
-            s++;
+            i = false;
+            statusPRO = 0;
         }
-        i = 0;
-        g = 0;
-        s = 0;
+        waitpid(pidProG , &statusPROG , WNOHANG);
+        if(statusPROG != 0)
+        {
+            j = false;
+            statusPROG = 0;
+        }
+        waitpid(pidProS , &statusPROS , WNOHANG);
+        if(statusPROS != 0)
+        {
+            j = false;
+            statusPROS = 0;
+        }
     }
 }
 
-void InizializzazioneArrayPid(int *PrimoPid , int *SecondoPid , int *TerzoPid)
-{
-    int i;
-    for(i = 0 ; i < 10 ; i++)
-    {
-        PrimoPid[i] = UNDEFINED;
-        SecondoPid[i] = UNDEFINED;
-        TerzoPid[i] = UNDEFINED;
-    }
-}
 
 /*momentaneamente ficchiamo la funzione qua per testing*/
 
