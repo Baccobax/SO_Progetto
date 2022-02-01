@@ -6,6 +6,7 @@ void main()
     int tubo[2];
     int i = 0 , pidNav , pidNem[NEMICI] ,status = 0;
     
+    
     //Start();
     initscr();
     noecho();

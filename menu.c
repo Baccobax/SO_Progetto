@@ -1,11 +1,10 @@
-#include "menu.h"
-#include "librerie.h"
+#include "SubroutinesSO.h"
 
 void sfondo(){
 
-    WINDOW *screen;
-    screen = newwin(24,80,0,0);
-    keypad(screen,1);
+    int MAXX, MAXY;
+    getmaxyx(stdscr, MAXY, MAXX);
+    keypad(stdscr,1);
     char stringa[4][30]={
             " _____ _____ _____ ____ ____ ",
             "|  ___|  _  |  _  | ___|  __|",
@@ -21,22 +20,22 @@ void sfondo(){
     int sy=(MAXY/2+2);
     while(true) {
 
-        wclear(screen);
+        clear();
 
         int g,y=1;
         for(g=0;g<4;g++){
-            mvwprintw(screen,y,MAXX/2-15,"%s",stringa[g]);
+            mvprintw(y,MAXX/2-15,"%s",stringa[g]);
             y++;
         }
         int z=5;
         for(g=0;g<4;g++){
-            mvwprintw(screen,z,MAXX/2-22,"%s",stringa2[g]);
+            mvwprintw(z,MAXX/2-22,"%s",stringa2[g]);
             z++;
         }
         int i;
         for (i = 0; i <= MAXY; i++){
             int x = rand()%MAXX;
-            mvwprintw(screen, i, x, ".");
+            mvprintw(i, x, ".");
             usleep(1000);
         }
 
@@ -44,14 +43,14 @@ void sfondo(){
         char impostazioni[] = "Impostazioni";
         char esci[] = "Esci";
         char selezione[] = "==>";
-        mvwprintw(screen, MAXY/2+2, MAXX/2-sizeof(avvio)/2, avvio);
-        mvwprintw(screen, MAXY/2+4, MAXX/2-sizeof(impostazioni)/2, impostazioni);
-        mvwprintw(screen, MAXY/2+6, MAXX/2-sizeof(esci)/2, esci);
+        mvprintw(MAXY/2+2, MAXX/2-sizeof(avvio)/2, avvio);
+        mvprintw(MAXY/2+4, MAXX/2-sizeof(impostazioni)/2, impostazioni);
+        mvprintw(MAXY/2+6, MAXX/2-sizeof(esci)/2, esci);
 
-        mvwprintw(screen, sy, MAXX/2-10, selezione);
+        mvprintw(sy, MAXX/2-10, selezione);
         timeout(1);
 
-        frecciaMenu=wgetch(screen);
+        frecciaMenu=getch();
         switch(frecciaMenu){
             case KEY_UP:
                 if(sy>MAXY/2+2)
@@ -65,15 +64,16 @@ void sfondo(){
                caricamento();
         }
 
-        wrefresh(screen);
+        refresh();
         }
 }
 
 void caricamento(){
-    WINDOW *screen;
     WINDOW *testo;
 
-    screen = newwin(24,80,0,0);
+    int MAXX, MAXY;
+    getmaxyx(stdscr, MAXY, MAXX);
+
     testo = newwin(5, 20, MAXY/2-2, MAXX/2-10);
     char amogus[5][13]={
             "    _______ ",
@@ -90,24 +90,24 @@ void caricamento(){
         int y,z;
 
         while(x<MAXX-5) {
-            wclear(screen);
+            clear();
             wclear(testo);
             box(testo, ACS_VLINE, ACS_HLINE);
             mvwprintw(testo, 2, 10-(sizeof (caricamento)/2), caricamento);
             y=MAXY-7;
             z=2;
             for (g = 0; g < 5; g++) {
-                mvwprintw(screen, z, x, "%s", amogus[g]);
+                mvprintw(z, x, "%s", amogus[g]);
                 z++;
                 usleep(10000);
             }
             for (g = 0; g < 5; g++) {
-                mvwprintw(screen, y, x, "%s", amogus[g]);
+                mvprintw(y, x, "%s", amogus[g]);
                 y++;
                 usleep(10000);
             }
             x+=5;
-            wrefresh(screen);
+            refresh();
             wrefresh(testo);
         }
     }

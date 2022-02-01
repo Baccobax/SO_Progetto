@@ -24,6 +24,9 @@ typedef enum AltoBasso {
     centro
 }AltoBasso;
 
+
+void sfondo();
+void caricamento();
 void Start();
 void GameOver();
 void NavicellaGiocatore();
