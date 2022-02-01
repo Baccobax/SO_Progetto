@@ -1,7 +1,7 @@
 #include "SubroutinesSO.h"
 
 void sfondo(){
-
+    //push
     int MAXX, MAXY;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr,1);
