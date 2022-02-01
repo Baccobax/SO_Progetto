@@ -29,7 +29,7 @@ void sfondo(){
         }
         int z=5;
         for(g=0;g<4;g++){
-            mvwprintw(z,MAXX/2-22,"%s",stringa2[g]);
+            mvprintw(z,MAXX/2-22,"%s",stringa2[g]);
             z++;
         }
         int i;
