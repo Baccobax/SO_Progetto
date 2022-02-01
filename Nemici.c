@@ -7,10 +7,10 @@
  * @param pidNem valore del pid collegato al processo del singolo nemico
  * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
  */
-void Nemici(int pipeout , int pidNem , int cont)
+void Nemici(int pipeout , int cont)
 {
     int MAXX , MAXY , MIDY , my = MOVIMENTO , statusPRO = 0;
-    AltoBasso a;   
+    AltoBasso a;
     getmaxyx(stdscr , MAXY , MAXX);
     pos pos_nemico , pos_pro_nem;
     
@@ -35,24 +35,26 @@ void Nemici(int pipeout , int pidNem , int cont)
 
     while(true)
     {
+        //mvprintw(20+cont , 20+cont , "%d , %d" , pos_nemico.x , pos_nemico.y);
+        refresh();
         switch(a)
         {
             case centro:
                 {
-                    usleep(5000);
+                    usleep(500000);
                     pos_nemico.x--;
-                    usleep(5000);
+                    usleep(500000);
                     write(pipeout , &pos_nemico , sizeof(pos_nemico));
                     //SparoNemici(pipeout , pos_nemico);
                     break;
                 }
             case alto:
                 {
-                    usleep(5000);
+                    usleep(500000);
                     pos_nemico.x--;
                     write(pipeout , &pos_nemico , sizeof(pos_nemico));
                     //SparoNemici(pipeout , pos_nemico);
-                    usleep(5000);
+                    usleep(500000);
                     if(pos_nemico.y < 2)
                     {
                         my = MOVIMENTO;
@@ -67,11 +69,11 @@ void Nemici(int pipeout , int pidNem , int cont)
                 }
                 case basso:
                 {
-                    usleep(5000);
+                    usleep(500000);
                     pos_nemico.x--;
                     write(pipeout , &pos_nemico , sizeof(pos_nemico));
                     //SparoNemici(pipeout , pos_nemico);
-                    usleep(5000);
+                    usleep(500000);
                     if(pos_nemico.y < (MAXY/2)+1)
                     {
                         my = MOVIMENTO;
@@ -111,11 +113,11 @@ void SparoNemici(int pipeout , pos nemico)
                     write(pipeout , &pro_nem , sizeof(pro_nem));
                     while(pro_nem.x > 3)
                     {
-                        usleep(50000);
+                        usleep(5000000);
                         pro_nem.x--;
                         write(pipeout , &pro_nem , sizeof(pro_nem));
                     }
-                    usleep(50000);
+                    usleep(5000000);
                     _exit(SIGUSR1);
                 }
             default:

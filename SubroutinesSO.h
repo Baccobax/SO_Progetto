@@ -25,15 +25,7 @@ typedef enum AltoBasso {
 }AltoBasso;
 
 
-void sfondo();
-void caricamento();
-void Start();
-void GameOver();
 void NavicellaGiocatore();
 void Nemici();
-void InizializzazioneArrayPid();
 void SparoNemici();
-//int Proiettili();
 void collision();
-//void Vittoria();
-//void GameOver();

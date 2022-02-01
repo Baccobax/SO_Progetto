@@ -267,6 +267,8 @@ void collision(int pipein)
         curs_set(false);
         refresh();
     } while((Nav.x != Nem.x || Nav.y != Nem.y) || Nem.x >= 2);
-    GameOver();
+    beep();
+    flash();
+    clear();
     refresh();
 }
