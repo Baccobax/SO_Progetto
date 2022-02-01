@@ -16,6 +16,7 @@ typedef struct pos {
     char c; /* carattere del oggetto */
     int x; /* coordinata x */
     int y; /* coordinata y */
+    bool up_down; 
 }pos;
 
 typedef enum AltoBasso {
@@ -24,8 +25,7 @@ typedef enum AltoBasso {
     centro
 }AltoBasso;
 
-void sfondo();
-void caricamento();
+
 void NavicellaGiocatore();
 void Nemici();
 void SparoNemici();

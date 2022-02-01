@@ -7,11 +7,11 @@ void main()
     int i = 0 , pidNav , pidNem[NEMICI] ,status = 0;
     
     
-    //Start();
+    
     initscr();
     noecho();
     curs_set(false);
-
+    //sfondo();
     refresh();
 
     if(pipe(tubo) == -1) //pipe fallisce
@@ -24,17 +24,19 @@ void main()
     switch(pidNav)
     {
         case -1:
-            {
-                perror("fork call");
-                _exit(2);
-            }
+        {
+            perror("fork call");
+            _exit(2);
+        }
 
         case 0: /*Processo Navicella*/
+        {
             close(tubo[0]);
             NavicellaGiocatore(tubo[1]);
             _exit(SIGUSR1);
-
-        default: /* processo padre */
+        }
+        default:
+        {    /* processo padre */
             for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicella: il numero di navicelle dipende dalla macro NEMICI
             {
                 pidNem[i] = fork();
@@ -54,7 +56,7 @@ void main()
             }
             close(tubo[1]);
             collision(tubo[0]);
-            /* ipotetico ciclo per uccidere le navicelle*/
+        }
     }
     while(wait(0) > 0);
     endwin();

@@ -14,12 +14,7 @@ void Nemici(int pipeout , int cont)
     getmaxyx(stdscr , MAXY , MAXX);
     pos pos_nemico , pos_pro_nem;
     
-    if(cont == 0)
-    {
-        pos_nemico.y = MAXY/2;
-        a = centro;
-    }
-    else if(cont % 2 == 0)
+    if(cont % 2 == 0)
     {
         pos_nemico.y = MAXY/2 + cont;
         a = alto;
@@ -31,61 +26,56 @@ void Nemici(int pipeout , int cont)
     }
     pos_nemico.x = MAXX-3;
     pos_nemico.c = '<';
+    a = alto;
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
     while(true)
     {
-        //mvprintw(20+cont , 20+cont , "%d , %d" , pos_nemico.x , pos_nemico.y);
         refresh();
         switch(a)
         {
-            case centro:
-                {
-                    usleep(500000);
-                    pos_nemico.x--;
-                    usleep(500000);
-                    write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                    //SparoNemici(pipeout , pos_nemico);
-                    break;
-                }
             case alto:
+            {
+                usleep(500000);
+                pos_nemico.x--;
+                write(pipeout , &pos_nemico , sizeof(pos_nemico));
+                //SparoNemici(pipeout , pos_nemico);
+                usleep(500000);
+                if(pos_nemico.y < 2)
                 {
-                    usleep(500000);
-                    pos_nemico.x--;
-                    write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                    //SparoNemici(pipeout , pos_nemico);
-                    usleep(500000);
-                    if(pos_nemico.y < 2)
-                    {
-                        my = MOVIMENTO;
-                    }
-                    if(pos_nemico.y > (MAXY/2)-1)
-                    {
-                        my = -MOVIMENTO;
-                    }
-                    pos_nemico.y += my;
-                    write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                    break;
+                    my = MOVIMENTO;
+                    pos_nemico.up_down = true;
                 }
-                case basso:
+                if(pos_nemico.y > (MAXY/2)-1)
                 {
-                    usleep(500000);
-                    pos_nemico.x--;
-                    write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                    //SparoNemici(pipeout , pos_nemico);
-                    usleep(500000);
-                    if(pos_nemico.y < (MAXY/2)+1)
-                    {
-                        my = MOVIMENTO;
-                    }
-                    if(pos_nemico.y >= MAXY-2)
-                    {
-                        my = -MOVIMENTO;
-                    }
-                    pos_nemico.y += my;
-                    write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                    break;
+                    my = -MOVIMENTO;
+                    pos_nemico.up_down = false;
                 }
+                pos_nemico.y += my;
+                write(pipeout , &pos_nemico , sizeof(pos_nemico));
+                break;
+            }
+            case basso:
+            {
+                usleep(500000);
+                pos_nemico.x--;
+                write(pipeout , &pos_nemico , sizeof(pos_nemico));
+                //SparoNemici(pipeout , pos_nemico);
+                usleep(500000);
+                if(pos_nemico.y < (MAXY/2)+1)
+                {
+                    my = MOVIMENTO;
+                    pos_nemico.up_down = true;
+                }
+                if(pos_nemico.y >= MAXY-2)
+                {
+                    my = -MOVIMENTO;
+                    pos_nemico.up_down = false;
+                }
+                pos_nemico.y += my;
+                write(pipeout , &pos_nemico , sizeof(pos_nemico));
+                break;
+            }
         }
     }
 }
@@ -107,23 +97,23 @@ void SparoNemici(int pipeout , pos nemico)
                 _exit(2);
                 break;
             case 0:
+            {
+                pro_nem.x = nemico.x-1;
+                pro_nem.y = nemico.y;
+                write(pipeout , &pro_nem , sizeof(pro_nem));
+                while(pro_nem.x > 3)
                 {
-                    pro_nem.x = nemico.x-1;
-                    pro_nem.y = nemico.y;
-                    write(pipeout , &pro_nem , sizeof(pro_nem));
-                    while(pro_nem.x > 3)
-                    {
-                        usleep(5000000);
-                        pro_nem.x--;
-                        write(pipeout , &pro_nem , sizeof(pro_nem));
-                    }
                     usleep(5000000);
-                    _exit(SIGUSR1);
+                    pro_nem.x--;
+                    write(pipeout , &pro_nem , sizeof(pro_nem));
                 }
+                usleep(5000000);
+                _exit(SIGUSR1);
+            }
             default:
-                {
-                    break;
-                }
+            {
+                break;
+            }
         }
     }
     waitpid(pid_pro_nem , &status_pro_nem , WNOHANG);
