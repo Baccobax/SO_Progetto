@@ -1,5 +1,6 @@
 #include <unistd.h>
-#include <stdio.h> 
+#include <stdio.h>
+#include <time.h>
 #include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/wait.h>
@@ -17,10 +18,18 @@ typedef struct pos {
     int y; /* coordinata y */
 }pos;
 
-//void NavicellaNemica(int pipeout);
+typedef enum AltoBasso {
+    alto , 
+    basso , 
+    centro
+}AltoBasso;
+
 void Start();
+void GameOver();
 void NavicellaGiocatore();
+void Nemici();
 void InizializzazioneArrayPid();
+void SparoNemici();
 //int Proiettili();
 void collision();
 //void Vittoria();

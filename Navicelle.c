@@ -172,7 +172,7 @@ void NavicellaGiocatore(int pipeout)
 
 void collision(int pipein)
 {
-    pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto;
+    pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto , Nem;
     int MAXY , MAXX;
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
@@ -187,9 +187,35 @@ void collision(int pipein)
         read(pipein, &valore_letto, sizeof(valore_letto));
         switch(valore_letto.c)
         {
+            case('<'):
+            {
+                if(valore_letto.x >= 3)
+                    {
+                        mvaddch(Nem.y, Nem.x , ' ');
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                    }
+                    if(valore_letto.x <= 3)
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x , ' ');                   
+                    }
+                Nem = valore_letto;
+                break;
+            }
+            case('#'):
+            {
+                if(valore_letto.x >= MAXX-3)
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x+1, ' ');
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                    }
+                if(valore_letto.x <= 3)
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x , ' ');                    
+                    }
+                break;
+            }
             case('>'):  //Navicella
             {
-
                 if(Nav.x >= 0)
                     {
                         mvaddch(Nav.y, Nav.x , ' ');
@@ -240,6 +266,7 @@ void collision(int pipein)
         }
         curs_set(false);
         refresh();
-    } while(true);
+    } while((Nav.x != Nem.x || Nav.y != Nem.y) || Nem.x >= 2);
+    GameOver();
     refresh();
 }

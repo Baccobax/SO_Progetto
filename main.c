@@ -4,7 +4,7 @@
 void main() 
 {
     int tubo[2];
-    int i = 0 , pidNav , status = 0;
+    int i = 0 , pidNav , pidNem[NEMICI] ,status = 0;
     
     //Start();
     initscr();
@@ -34,26 +34,6 @@ void main()
             _exit(SIGUSR1);
 
         default: /* processo padre */
-            /*
-            pidPro = fork();
-
-            switch ( pidPro )
-            {
-            case -1:
-                perror("fork call");
-                _exit(2);
-                break;
-
-            case 0: /rocesso Proiettile
-                close(tubo[0]);
-                Proiettili(tubo[1]);
-            
-            default:
-                close(tubo[1]);
-                collision(tubo[0]);
-            }
-
-            
             for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicella: il numero di navicelle dipende dalla macro NEMICI
             {
                 pidNem[i] = fork();
@@ -61,20 +41,16 @@ void main()
                 switch (pidNem[i])
                 {
                     case -1:
-                    perror("fork call");
-                    _exit(i+3);
+                        perror("fork call");
+                        _exit(3);
                     case 0: //Processo singola Navicella nemica
                     {
                         close(tubo[0]);
-                        //NavicellaNemica(tubo[1]);
+                        Nemici(tubo[1] , pidNem , i);
                         break;
                     }
-                    default: /*Processo padre pt.2, il mio "main" in pratica
-                    {
-                        
-                    }
                 }
-            } */
+            }
             close(tubo[1]);
             collision(tubo[0]);
             /* ipotetico ciclo per uccidere le navicelle*/
