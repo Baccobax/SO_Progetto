@@ -198,8 +198,8 @@ void collision(int pipein)
                     {
                         if(valore_letto.x >= 3)
                         {
-                            mvaddch(valore_letto.y , valore_letto.x- , ' ');
-                            mvaddch(valore_letto.y+ , valore_letto.x , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x , ' ');
                             mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
                         }
                         if(valore_letto.x <= 3)

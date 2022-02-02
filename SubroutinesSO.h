@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 #include <ncurses.h>
+#include <string.h>
 
 #define NEMICI 10 //Macro dedicata al numero dei nemici
 #define MOVIMENTO 1 //Macro utilizzata per lo spostamento diagonale dei proiettili
@@ -19,13 +20,21 @@ typedef struct pos {
     bool up_down; 
 }pos;
 
+typedef struct freccia{
+    char stringa[4];
+    int pos;
+    int input;
+}freccia;
+
 typedef enum AltoBasso {
     alto , 
     basso , 
     centro
 }AltoBasso;
 
-
+void sfondo();
+void caricamento();
+void settings();
 void NavicellaGiocatore();
 void Nemici();
 void SparoNemici();
