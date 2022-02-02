@@ -194,12 +194,12 @@ void collision(int pipein)
             {
                 switch (valore_letto.up_down)
                 {
-                    case true:
+                    case true: //La navicella va verso giu
                     {
                         if(valore_letto.x >= 3)
                         {
-                            mvaddch(valore_letto.y , valore_letto.x , ' ');
-                            mvaddch(valore_letto.y , valore_letto.x , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
+                            mvaddch(valore_letto.y-1 , valore_letto.x , ' ');
                             mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
                         }
                         if(valore_letto.x <= 3)
@@ -210,9 +210,19 @@ void collision(int pipein)
                     }
                     break;
                     
-                    case false:
+                    case false: //La navicella va su
                     {
-
+                        if(valore_letto.x >= 3)
+                        {
+                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                        }
+                        if(valore_letto.x <= 3)
+                        {
+                            mvaddch(valore_letto.y , valore_letto.x , ' ');                   
+                        }
+                        Nem = valore_letto;  
                     }
                     break;
                 }

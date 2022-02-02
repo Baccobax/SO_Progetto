@@ -8,7 +8,7 @@
 #include <ncurses.h>
 #include <string.h>
 
-#define NEMICI 10 //Macro dedicata al numero dei nemici
+#define NEMICI 1 //Macro dedicata al numero dei nemici
 #define MOVIMENTO 1 //Macro utilizzata per lo spostamento diagonale dei proiettili
 #define UNDEFINED -2 //Macro utilizzata per la definizione degli array di PID (vedi più in "Navicelle.c")
 
