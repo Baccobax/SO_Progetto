@@ -40,7 +40,7 @@ void main()
             for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicella: il numero di navicelle dipende dalla macro NEMICI
             {
                 pidNem[i] = fork();
-            
+                
                 switch (pidNem[i])
                 {
                     case -1:

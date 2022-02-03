@@ -177,6 +177,7 @@ void collision(int pipein)
 {
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto , Nem;
     int MAXY , MAXX;
+    bool game_over = false, victory = false; 
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
     proiettile.x =- 1;
@@ -196,15 +197,16 @@ void collision(int pipein)
                 {
                     case true: //La navicella va verso giu
                     {
-                        if(valore_letto.x >= 3)
+                        if(valore_letto.x > 3)
                         {
-                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
                             mvaddch(valore_letto.y-1 , valore_letto.x , ' ');
                             mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
                         }
                         if(valore_letto.x <= 3)
                         {
-                            mvaddch(valore_letto.y , valore_letto.x , ' ');                   
+                            mvaddch(valore_letto.y , valore_letto.x , ' ');
+                            game_over = true;                   
                         }
                         Nem = valore_letto;           
                     }
@@ -214,8 +216,8 @@ void collision(int pipein)
                     {
                         if(valore_letto.x >= 3)
                         {
-                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
-                            mvaddch(valore_letto.y , valore_letto.x-1 , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
+                            mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
                             mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
                         }
                         if(valore_letto.x <= 3)
@@ -293,7 +295,7 @@ void collision(int pipein)
         }
         curs_set(false);
         refresh();
-    } while((Nav.x != Nem.x || Nav.y != Nem.y) || Nem.x >= 2);
+    } while(game_over == false && victory == false);
     beep();
     flash();
     clear();

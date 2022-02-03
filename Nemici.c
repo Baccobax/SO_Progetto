@@ -26,7 +26,6 @@ void Nemici(int pipeout , int cont)
     }
     pos_nemico.x = MAXX-3;
     pos_nemico.c = '<';
-    a = alto;
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
     while(true)
@@ -36,12 +35,13 @@ void Nemici(int pipeout , int cont)
         {
             case alto:
             {
-                usleep(500000);
+                usleep(750000);
                 pos_nemico.x--;
+                pos_nemico.y++;
                 write(pipeout , &pos_nemico , sizeof(pos_nemico));
                 //SparoNemici(pipeout , pos_nemico);
-                usleep(500000);
-                if(pos_nemico.y < 2)
+                usleep(750000);
+                /*if(pos_nemico.y < 2)
                 {
                     my = MOVIMENTO;
                     pos_nemico.up_down = true;
@@ -50,8 +50,10 @@ void Nemici(int pipeout , int cont)
                 {
                     my = -MOVIMENTO;
                     pos_nemico.up_down = false;
-                }
-                pos_nemico.y += my;
+                }*/
+                //pos_nemico.y += my;
+                pos_nemico.x--;
+                pos_nemico.y--;
                 write(pipeout , &pos_nemico , sizeof(pos_nemico));
                 break;
             }
@@ -80,6 +82,12 @@ void Nemici(int pipeout , int cont)
     }
 }
 
+/**
+ * @brief 
+ * 
+ * @param pipeout 
+ * @param nemico 
+ */
 void SparoNemici(int pipeout , pos nemico)
 {
     int pid_pro_nem , status_pro_nem;
