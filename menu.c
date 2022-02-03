@@ -4,9 +4,6 @@
 void sfondo(){
     //push
     start_color();
-    init_pair(4, COLOR_WHITE, COLOR_BLACK);
-    attron(COLOR_PAIR(4));
-    bkgd(COLOR_PAIR(4));
     int MAXX, MAXY;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr,1);
@@ -99,12 +96,13 @@ void settings(){
         char scolore[] = "Cambia colori";
         char snav[] = "Cambia navicella";
         char back[] = "Torna al menu";
+        char scegliScritta[] = "Scegli il colore della scritta";
+        char scegliSfondo[] = "Scegli il colore dello sfondo";
+        char scegliNavicella[] = "Scegli la navicella";
         char colori[8][8]={"Nero   ", "Rosso  ", "Verde  ", "Giallo ", "Blu    ", "Magenta", "Ciano  ", "Bianco "};
         int asciiColori[8]={COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE};
         int coloreSfondo, coloreScritta;
-        init_pair(1, COLOR_RED, COLOR_BLACK);
-        init_pair(2, COLOR_WHITE, COLOR_BLUE);
-        init_pair(3, COLOR_BLUE, COLOR_WHITE);
+
         strcpy(pointer.stringa, "==>");
         char nav1[4][7]={
             " ____ ",
@@ -118,7 +116,7 @@ void settings(){
             "|  _|",
             "|_|  "
         };
-        char nav3[6][7]={
+        char nav3[4][7]={
             "   ^  ",
             "// _ \\",
             "\\   //",
@@ -145,13 +143,12 @@ void settings(){
                         while(i==0){
                             clear();
                             int c=-8;
-                            int posColore[8];
                             for(j=0; j<8; j++){
                                 mvprintw(MAXY/2+c, MAXX/2-sizeof(colori[j])/2, colori[j]);
-                                posColore[j]=MAXY/2+c;
                                 c+=2;
                             }
                             
+                            mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliScritta)/2, scegliScritta);
                             mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
 
                             pointer.input=getch();
@@ -167,24 +164,93 @@ void settings(){
                                     break;
                                 case 'q': 
                                     c=-8;
-                                    for(j=0; i<8; j++){
+                                    for(j=0; j<8; j++){
                                         if(pointer.pos==MAXY/2+c){
                                             coloreScritta=asciiColori[j];
                                         }
                                         c+=2;
                                     }
-                                    init_pair(1, coloreScritta, COLOR_BLACK);
-                                    attron(COLOR_PAIR(1));
-                                    settings();
-                                }
-                                                
+                                    while(true){
+                                        clear();
+                                        int c=-8;
+                                        for(j=0; j<8; j++){
+                                            mvprintw(MAXY/2+c, MAXX/2-sizeof(colori[j])/2, colori[j]);
+                                            c+=2;
+                                        }
+                                        
+                                        mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliSfondo)/2, scegliSfondo);
+                                        mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
+
+                                        pointer.input=getch();
+
+                                        switch(pointer.input){
+                                            case KEY_UP:
+                                                if(pointer.pos>MAXY/2-8)
+                                                    pointer.pos-=2;
+                                                break;
+                                            case KEY_DOWN:
+                                                if(pointer.pos<MAXY/2+6)
+                                                    pointer.pos+=2;
+                                                break;
+                                            case 'q': 
+                                                c=-8;
+                                                for(j=0; j<8; j++){
+                                                    if(pointer.pos==MAXY/2+c){
+                                                        coloreSfondo=asciiColori[j];
+                                                    }
+                                                    c+=2;
+                                                }
+                                                init_pair(1, coloreScritta, coloreSfondo);
+                                                attron(COLOR_PAIR(1));
+                                                bkgd(COLOR_PAIR(1));
+                                                settings();
+                                            }
+                                    }
+                            }                
                             refresh();        
                         };
                 }else if(pointer.pos==MAXY/2+4){
-                        settings();
+                    pointer.pos=MAXY/2-7;
+                        while(true){
+                            clear();
+                            mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliNavicella)/2, scegliNavicella);
+                            int c=-8;
+                            
+                            for (j=0; j<4; j++){
+                                mvprintw(MAXY/2+c, MAXX/2, nav1[j]);
+                                c+=1;
+                            }
+                            c+=2;
+                            for (j=0; j<4; j++){
+                                mvprintw(MAXY/2+c, MAXX/2, nav2[j]);
+                                c+=1;
+                            }
+                            c+=2;
+                            for (j=0; j<4; j++){
+                                mvprintw(MAXY/2+c, MAXX/2, nav3[j]);
+                                c+=1;
+                            }
+                            
+                            mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
+                            
+                            pointer.input=getch();
+
+                            switch(pointer.input){
+                                case KEY_UP:
+                                    if(pointer.pos>MAXY/2-7)
+                                        pointer.pos-=6;
+                                    break;
+                                case KEY_DOWN:
+                                    if(pointer.pos<MAXY/2+5)
+                                        pointer.pos+=6;
+                                    break;
+                                case 'q':
+                                    settings();
+                            }    
+                            refresh();
+                        }
                 }else{
-                        endwin();
-                        exit(0);
+                        sfondo();
                     }
 
         }
