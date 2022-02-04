@@ -193,41 +193,19 @@ void collision(int pipein)
         {
             case('<'):  //Navicella nemica
             {
-                switch (valore_letto.up_down)
+                if(valore_letto.x > 3)
                 {
-                    case true: //La navicella va verso giu
-                    {
-                        if(valore_letto.x > 3)
-                        {
-                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
-                            mvaddch(valore_letto.y-1 , valore_letto.x , ' ');
-                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
-                        }
-                        if(valore_letto.x <= 3)
-                        {
-                            mvaddch(valore_letto.y , valore_letto.x , ' ');
-                            game_over = true;                   
-                        }
-                        Nem = valore_letto;           
-                    }
-                    break;
-                    
-                    case false: //La navicella va su
-                    {
-                        if(valore_letto.x >= 3)
-                        {
-                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
-                            mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
-                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
-                        }
-                        if(valore_letto.x <= 3)
-                        {
-                            mvaddch(valore_letto.y , valore_letto.x , ' ');                   
-                        }
-                        Nem = valore_letto;  
-                    }
-                    break;
+                    mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
+                    mvaddch(valore_letto.y , valore_letto.x+1, ' ');
+                    mvaddch(valore_letto.y-1 , valore_letto.x , ' ');
+                    mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
                 }
+                if(valore_letto.x <= 3)
+                {
+                    mvaddch(valore_letto.y , valore_letto.x , ' ');
+                    game_over = true;                   
+                }
+                Nem = valore_letto;
                 break;
             }
             case('#'):  //Proiettile nemico

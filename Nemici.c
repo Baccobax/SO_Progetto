@@ -16,18 +16,20 @@ void Nemici(int pipeout , int cont)
     
     if(cont % 2 == 0)
     {
-        pos_nemico.y = MAXY/2 + cont;
+        pos_nemico.y = MAXY/2 + cont+2;
         a = alto;
     }
     else
     {
-        pos_nemico.y = MAXY/2 - cont;
+        pos_nemico.y = MAXY/2 - cont-2;
         a = basso;
     }
     pos_nemico.x = MAXX-3;
     pos_nemico.c = '<';
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
+    pos_nemico.up_down = true;
+    a = alto;
     while(true)
     {
         refresh();
@@ -35,25 +37,20 @@ void Nemici(int pipeout , int cont)
         {
             case alto:
             {
-                usleep(750000);
-                pos_nemico.x--;
-                pos_nemico.y++;
-                write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                //SparoNemici(pipeout , pos_nemico);
-                usleep(750000);
-                /*if(pos_nemico.y < 2)
+                usleep(500000);
+                if(pos_nemico.up_down == true)
                 {
-                    my = MOVIMENTO;
+                    pos_nemico.y--;
+                    pos_nemico.up_down = false;
+                }
+                else
+                {
+                    pos_nemico.y++;
                     pos_nemico.up_down = true;
                 }
-                if(pos_nemico.y > (MAXY/2)-1)
-                {
-                    my = -MOVIMENTO;
-                    pos_nemico.up_down = false;
-                }*/
-                //pos_nemico.y += my;
+                write(pipeout , &pos_nemico , sizeof(pos_nemico));
+                usleep(500000);
                 pos_nemico.x--;
-                pos_nemico.y--;
                 write(pipeout , &pos_nemico , sizeof(pos_nemico));
                 break;
             }
@@ -62,7 +59,7 @@ void Nemici(int pipeout , int cont)
                 usleep(500000);
                 pos_nemico.x--;
                 write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                //SparoNemici(pipeout , pos_nemico);
+                
                 usleep(500000);
                 if(pos_nemico.y < (MAXY/2)+1)
                 {
