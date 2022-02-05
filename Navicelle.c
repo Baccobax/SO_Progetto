@@ -204,10 +204,12 @@ void collision(int pipein)
                     mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
                     mvaddch(valore_letto.y , valore_letto.x+1, ' ');
                     mvaddch(valore_letto.y-1 , valore_letto.x , ' ');*/
-                    for(i=0; i<3; i++){
+                    for(i=0; i < 3; i++)
+                    {
                         mvprintw(valore_letto.y+sy, valore_letto.x-1, valore_letto.c[i]);
-                        sy+=1;
+                        sy += 1;
                     }
+                    sy = -1;
                 
                 }   
                 if(valore_letto.x <= 3)

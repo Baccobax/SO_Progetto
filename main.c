@@ -4,7 +4,7 @@
 void main() 
 {
     int tubo[2];
-    int i = 0 , pidNav , pidNem[NEMICI] ,status = 0;
+    int i = 0 , pidNav , status = 0 , column_nem , pidNem[NEMICI];
     
     
     
@@ -13,6 +13,7 @@ void main()
     curs_set(false);
     //sfondo();
     refresh();
+    column_nem = getmaxy(stdscr)*5 / 23; //numero di nemici
 
     if(pipe(tubo) == -1) //pipe fallisce
     {
@@ -49,7 +50,7 @@ void main()
                     case 0: //Processo singola Navicella nemica
                     {
                         close(tubo[0]);
-                        Nemici(tubo[1] , i);
+                        Nemici(tubo[1] , i , column_nem);
                         break;
                     }
                 }

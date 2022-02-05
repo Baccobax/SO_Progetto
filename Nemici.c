@@ -7,25 +7,32 @@
  * @param pidNem valore del pid collegato al processo del singolo nemico
  * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
  */
-void Nemici(int pipeout , int cont)
+void Nemici(int pipeout , int cont , int column)
 {
-    int MAXX , MAXY , MIDY , my = MOVIMENTO , statusPRO = 0;
-    AltoBasso a;
+    int MAXX , MAXY , MIDY , statusPRO = 0 , mx , my;
     getmaxyx(stdscr , MAXY , MAXX);
     pos pos_nemico , pos_pro_nem;
+
+    mx = cont/column;
+
+    pos_nemico.x = MAXX - BRDDISTANCE - ((BRDDISTANCE+1)*mx);
     
+    my = (cont / column); 
+
+    if(cont == 0 || cont % column == 0)
+    {
+        pos_nemico.y = MAXY/2;
+    }
     if(cont % 2 == 0)
     {
-        pos_nemico.y = MAXY/2 + cont+2;
-        a = alto;
+        pos_nemico.y = (MAXY/2) - my*2;
     }
     else
     {
-        pos_nemico.y = MAXY/2 - cont-2;
-        a = basso;
+        pos_nemico.y = (MAXY/2)+3 + my*2;
     }
-    pos_nemico.x = MAXX-3;
-    
+
+
     strcpy(pos_nemico.c[0], " | ");
     strcpy(pos_nemico.c[1], "-0-");
     strcpy(pos_nemico.c[2], " | ");
@@ -33,53 +40,23 @@ void Nemici(int pipeout , int cont)
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
     pos_nemico.up_down = true;
-    a = alto;
     while(true)
     {
-        refresh();
-        switch(a)
+        usleep(500000);
+        if(pos_nemico.up_down == true)
         {
-            case alto:
-            {
-                usleep(500000);
-                if(pos_nemico.up_down == true)
-                {
-                    pos_nemico.y--;
-                    pos_nemico.up_down = false;
-                }
-                else
-                {
-                    pos_nemico.y++;
-                    pos_nemico.up_down = true;
-                }
-                write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                usleep(500000);
-                pos_nemico.x--;
-                write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                break;
-            }
-            case basso:
-            {
-                usleep(500000);
-                pos_nemico.x--;
-                write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                
-                usleep(500000);
-                if(pos_nemico.y < (MAXY/2)+1)
-                {
-                    my = MOVIMENTO;
-                    pos_nemico.up_down = true;
-                }
-                if(pos_nemico.y >= MAXY-2)
-                {
-                    my = -MOVIMENTO;
-                    pos_nemico.up_down = false;
-                }
-                pos_nemico.y += my;
-                write(pipeout , &pos_nemico , sizeof(pos_nemico));
-                break;
-            }
+            pos_nemico.y--;
+            pos_nemico.up_down = false;
         }
+        else
+        {
+            pos_nemico.y++;
+            pos_nemico.up_down = true;
+        }
+        write(pipeout , &pos_nemico , sizeof(pos_nemico));
+        usleep(500000);
+        pos_nemico.x--;
+        write(pipeout , &pos_nemico , sizeof(pos_nemico));
     }
 }
 

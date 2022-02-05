@@ -8,8 +8,9 @@
 #include <ncurses.h>
 #include <string.h>
 
-#define NEMICI 8 //Macro dedicata al numero dei nemici
+#define NEMICI 11 //Macro dedicata al numero dei nemici
 #define MOVIMENTO 1 //Macro utilizzata per lo spostamento diagonale dei proiettili
+#define BRDDISTANCE 3 //Macro utilizzata per indicare la distanza minima dal bordo
 #define UNDEFINED -2 //Macro utilizzata per la definizione degli array di PID (vedi più in "Navicelle.c")
 
 /* Struttura per la comunicazione tra figli e padre */
@@ -28,11 +29,6 @@ typedef struct freccia{
     int input;
 }freccia;
 
-typedef enum AltoBasso {
-    alto , 
-    basso , 
-    centro
-}AltoBasso;
 
 void sfondo();
 void caricamento();
