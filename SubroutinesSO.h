@@ -14,11 +14,13 @@
 
 /* Struttura per la comunicazione tra figli e padre */
 typedef struct pos {
-    char c; /* carattere del oggetto */
+    char c[3][4]; /* carattere del oggetto */
+    char cp;
     int x; /* coordinata x */
     int y; /* coordinata y */
     bool up_down; 
 }pos;
+
 
 typedef struct freccia{
     char stringa[4];

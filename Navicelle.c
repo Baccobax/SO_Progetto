@@ -7,12 +7,15 @@ void NavicellaGiocatore(int pipeout)
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
     pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su;
-    pos_navicella.c = '>';
+    strcpy(pos_navicella.c[0], "XX ");
+    strcpy(pos_navicella.c[1], "XXX");
+    strcpy(pos_navicella.c[2], "XX ");
+
     pos_navicella.x = 1;
     pos_navicella.y = MAXY/2;
-    pos_proiettile.c = '+';
-    pos_proiettile_giu.c = '\\';
-    pos_proiettile_su.c = '/';
+    pos_proiettile.cp = '+';
+    pos_proiettile_giu.cp = '\\';
+    pos_proiettile_su.cp = '/';
     write(pipeout , &pos_navicella , sizeof(pos_navicella));
 
     while(true)
@@ -92,12 +95,12 @@ void NavicellaGiocatore(int pipeout)
                                 if(pos_proiettile_giu.y < 2) 
                                 {
                                     dyG = MOVIMENTO;
-                                    pos_proiettile_giu.c = '\\';
+                                    pos_proiettile_giu.cp = '\\';
                                 }
                                 if(pos_proiettile_giu.y >= MAXY - 2)
                                 {
                                     dyG = -MOVIMENTO;
-                                    pos_proiettile_giu.c = '/';
+                                    pos_proiettile_giu.cp = '/';
                                 }
                                 usleep(43000);
                                 pos_proiettile_giu.y += dyG;
@@ -126,12 +129,12 @@ void NavicellaGiocatore(int pipeout)
                                         if(pos_proiettile_su.y < 2) 
                                         {
                                             dyS = MOVIMENTO;
-                                            pos_proiettile_su.c = '\\';
+                                            pos_proiettile_su.cp = '\\';
                                         }
                                         if(pos_proiettile_su.y >= MAXY - 2)
                                         {
                                             dyS = -MOVIMENTO;
-                                            pos_proiettile_su.c = '/';
+                                            pos_proiettile_su.cp = '/';
                                         }
                                         usleep(43000);
                                         pos_proiettile_su.y += dyS;
@@ -176,7 +179,7 @@ void NavicellaGiocatore(int pipeout)
 void collision(int pipein)
 {
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto , Nem;
-    int MAXY , MAXX;
+    int MAXY , MAXX, i, sy=-1;
     bool game_over = false, victory = false; 
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
@@ -189,17 +192,24 @@ void collision(int pipein)
     do
     {
         read(pipein, &valore_letto, sizeof(valore_letto));
-        switch(valore_letto.c)
+        switch(valore_letto.c[0][1])
         {
-            case('<'):  //Navicella nemica
+            case('|'):  //Navicella nemica
             {
                 if(valore_letto.x > 3)
                 {
+                    /*for(i=0; i<3; i++){
+                        mvprintw(valore_letto.y)
+                    }
                     mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
                     mvaddch(valore_letto.y , valore_letto.x+1, ' ');
-                    mvaddch(valore_letto.y-1 , valore_letto.x , ' ');
-                    mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
-                }
+                    mvaddch(valore_letto.y-1 , valore_letto.x , ' ');*/
+                    for(i=0; i<3; i++){
+                        mvprintw(valore_letto.y+sy, valore_letto.x-1, valore_letto.c[i]);
+                        sy+=1;
+                    }
+                
+                }   
                 if(valore_letto.x <= 3)
                 {
                     mvaddch(valore_letto.y , valore_letto.x , ' ');
@@ -221,7 +231,7 @@ void collision(int pipein)
                     }
                 break;
             }
-            case('>'):  //Navicella
+            case('X'):  //Navicella
             {
                 if(Nav.x >= 0)
                     {

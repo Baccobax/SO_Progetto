@@ -25,7 +25,11 @@ void Nemici(int pipeout , int cont)
         a = basso;
     }
     pos_nemico.x = MAXX-3;
-    pos_nemico.c = '<';
+    
+    strcpy(pos_nemico.c[0], " | ");
+    strcpy(pos_nemico.c[1], "-0-");
+    strcpy(pos_nemico.c[2], " | ");
+
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
     pos_nemico.up_down = true;
@@ -90,7 +94,7 @@ void SparoNemici(int pipeout , pos nemico)
     int pid_pro_nem , status_pro_nem;
     bool flag_pro = false;
     pos pro_nem;
-    pro_nem.c = '#';
+    pro_nem.cp = '#';
     if(flag_pro == false)
     {
         flag_pro = true;
