@@ -50,7 +50,7 @@ void main()
                     case 0: //Processo singola Navicella nemica
                     {
                         close(tubo[0]);
-                        Nemici(tubo[1] , i , column_nem);
+                        Nemici(tubo[1] , i , column_nem , pidNem);
                         break;
                     }
                 }

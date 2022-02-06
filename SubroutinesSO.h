@@ -8,10 +8,10 @@
 #include <ncurses.h>
 #include <string.h>
 
-#define NEMICI 11 //Macro dedicata al numero dei nemici
-#define MOVIMENTO 1 //Macro utilizzata per lo spostamento diagonale dei proiettili
-#define BRDDISTANCE 3 //Macro utilizzata per indicare la distanza minima dal bordo
-#define UNDEFINED -2 //Macro utilizzata per la definizione degli array di PID (vedi più in "Navicelle.c")
+#define NEMICI 6        //Macro dedicata al numero dei nemici
+#define MOVIMENTO 1     //Macro utilizzata per lo spostamento diagonale dei proiettili
+#define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
+#define UNDEFINED -2    //Macro utilizzata per la definizione degli array di PID (vedi più in "Navicelle.c")
 
 /* Struttura per la comunicazione tra figli e padre */
 typedef struct pos {
@@ -19,7 +19,9 @@ typedef struct pos {
     char cp;
     int x; /* coordinata x */
     int y; /* coordinata y */
-    bool up_down; 
+    bool up_down;
+    int indice_oggetto
+    int life;
 }pos;
 
 

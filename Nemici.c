@@ -7,29 +7,31 @@
  * @param pidNem valore del pid collegato al processo del singolo nemico
  * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
  */
-void Nemici(int pipeout , int cont , int column)
+void Nemici(int pipeout , int cont , int column , int *pid_nem)
 {
-    int MAXX , MAXY , MIDY , statusPRO = 0 , mx , my;
+    int MAXX , MAXY , MIDY , statusPRO = 0 , mx , my , status_nem[NEMICI];
     getmaxyx(stdscr , MAXY , MAXX);
     pos pos_nemico , pos_pro_nem;
-
+    pos_nemico.life = 2;
+    pos_nemico.indice_oggetto = cont;
+    
     mx = cont/column;
 
     pos_nemico.x = MAXX - BRDDISTANCE - ((BRDDISTANCE+1)*mx);
     
-    my = (cont / column); 
+    my = cont % column; 
 
-    if(cont == 0 || cont % column == 0)
+    if(my == 0 )
     {
         pos_nemico.y = MAXY/2;
     }
-    if(cont % 2 == 0)
+    if(my % 2 == 0)
     {
         pos_nemico.y = (MAXY/2) - my*2;
     }
     else
     {
-        pos_nemico.y = (MAXY/2)+3 + my*2;
+        pos_nemico.y = (MAXY/2) + 2 + my*2;
     }
 
 
@@ -40,8 +42,17 @@ void Nemici(int pipeout , int cont , int column)
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
     pos_nemico.up_down = true;
-    while(true)
+    while(pos_nemico.x > BRDDISTANCE)
     {
+        /*while ( condition )
+        {
+            if(vite == 1)
+            {
+                modificamatrice();
+                flagcondizionewhile = false;
+            }
+        }*/
+        
         usleep(500000);
         if(pos_nemico.up_down == true)
         {
@@ -57,6 +68,17 @@ void Nemici(int pipeout , int cont , int column)
         usleep(500000);
         pos_nemico.x--;
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
+
+        read(pipein , &pos_nemico.life , sizeof(pos_nemico.life));
+        if(pos_nemico.life <= 0)
+        {
+            _exit(SIGUSR1);
+        }
+        waitpid(pid_nem[cont] , status_nem[cont] , WNOHANG);
+        /*if (/* condition )
+        {
+            /* code 
+        }*/
     }
 }
 
@@ -109,3 +131,4 @@ void SparoNemici(int pipeout , pos nemico)
         status_pro_nem = 0;
     }
 }
+
