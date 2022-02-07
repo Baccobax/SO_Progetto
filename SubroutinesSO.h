@@ -20,7 +20,7 @@ typedef struct pos {
     int x; /* coordinata x */
     int y; /* coordinata y */
     bool up_down;
-    int indice_oggetto
+    int indice_oggetto;
     int life;
 }pos;
 

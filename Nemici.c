@@ -69,7 +69,7 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
         pos_nemico.x--;
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
-        read(pipein , &pos_nemico.life , sizeof(pos_nemico.life));
+        //read(pipein , &pos_nemico.life , sizeof(pos_nemico.life));
         if(pos_nemico.life <= 0)
         {
             _exit(SIGUSR1);

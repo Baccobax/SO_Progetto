@@ -57,7 +57,7 @@ void NavicellaGiocatore(int pipeout)
                         case 0:
                         //Processo Proiettile
                         {
-                            pos_proiettile.x = pos_navicella.x + 1;
+                            pos_proiettile.x = pos_navicella.x + 4;
                             pos_proiettile.y = pos_navicella.y;
                             write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                             while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
@@ -87,8 +87,8 @@ void NavicellaGiocatore(int pipeout)
                                 break;
                         case 0:
                         {
-                            pos_proiettile_giu.x = pos_navicella.x + 1;
-                            pos_proiettile_giu.y = pos_navicella.y + 1;
+                            pos_proiettile_giu.x = pos_navicella.x + 4;
+                            pos_proiettile_giu.y = pos_navicella.y-1;
                             write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
                             while(pos_proiettile_giu.x < MAXX - 2)
                             {
@@ -121,7 +121,7 @@ void NavicellaGiocatore(int pipeout)
                                     break;
                                 case 0:
                                 {
-                                    pos_proiettile_su.x = pos_navicella.x + 1;
+                                    pos_proiettile_su.x = pos_navicella.x + 4;
                                     pos_proiettile_su.y = pos_navicella.y - 1;
                                     write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
                                     while(pos_proiettile_su.x < MAXX - 2)
@@ -188,28 +188,28 @@ void collision(int pipein)
 
     border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
     refresh();
-
     do
     {
         read(pipein, &valore_letto, sizeof(valore_letto));
-        switch(valore_letto.c[0][1]) //da correggere in modo da far controllare il carattere centrale
+        switch(valore_letto.c[1][1]) //da correggere in modo da far controllare il carattere centrale
         {
-            case('|'):  //Navicella nemica
+            case('0'):  //Navicella nemica
             {
                 if(valore_letto.x > BRDDISTANCE)
                 {
-                    /*for(i=0; i<3; i++){
-                        mvprintw(valore_letto.y)
+                    for(i=0; i<5; i++){
+                        mvprintw(valore_letto.y+sy-1, valore_letto.x, "   ");
+                        sy+=1;
                     }
-                    mvaddch(valore_letto.y+1 , valore_letto.x , ' ');
-                    mvaddch(valore_letto.y , valore_letto.x+1, ' ');
-                    mvaddch(valore_letto.y-1 , valore_letto.x , ' ');*/
+                    
+                    sy = -1;
                     for(i=0; i < 3; i++)
                     {
                         mvprintw(valore_letto.y+sy, valore_letto.x-1, valore_letto.c[i]);
                         sy += 1;
                     }
                     sy = -1;
+                    
                 
                 }   
                 if(valore_letto.x <= BRDDISTANCE)
@@ -220,12 +220,37 @@ void collision(int pipein)
                 Nem = valore_letto;
                 break;
             }
+            
+            case('X'):  //Navicella
+            {
+                if(Nav.x >= 0)
+                    {
+                        for(i=0; i < 9; i++)
+                        {
+                            mvprintw(valore_letto.y+sy-3, valore_letto.x, "   ");
+                            sy += 1;
+                        }
+                        sy=-1;
+                        for(i=0; i < 3; i++)
+                        {
+                            mvprintw(valore_letto.y+sy, valore_letto.x, valore_letto.c[i]);
+                            sy += 1;
+                        }
+                        sy = -1;
+                    }
+                Nav = valore_letto;
+                break;
+            }
+            
+        }
+
+        switch(valore_letto.cp){
             case('#'):  //Proiettile nemico
             {
                 if(valore_letto.x >= MAXX-BRDDISTANCE)
                     {
                         mvaddch(valore_letto.y , valore_letto.x+1, ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
                     }
                 if(valore_letto.x <= BRDDISTANCE)
                     {
@@ -233,22 +258,12 @@ void collision(int pipein)
                     }
                 break;
             }
-            case('X'):  //Navicella
-            {
-                if(Nav.x >= 0)
-                    {
-                        mvaddch(Nav.y, Nav.x , ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
-                    }
-                Nav = valore_letto;
-                break;
-            }
             case('+'):  //Proiettile base
             {
                 if(valore_letto.x >= BRDDISTANCE)
                     {
                         mvaddch(valore_letto.y , valore_letto.x-1, ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
                     }
                 if(valore_letto.x >= MAXX-2)
                     {
@@ -262,7 +277,7 @@ void collision(int pipein)
                 if(valore_letto.x >= BRDDISTANCE)
                     {
                         mvaddch(valore_letto.y-1 , valore_letto.x-1, ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
                     }
                 if(valore_letto.x >= MAXX-2)
                     {
@@ -275,7 +290,7 @@ void collision(int pipein)
                 if(valore_letto.x >= BRDDISTANCE)
                     {
                         mvaddch(valore_letto.y+1 , valore_letto.x-1, ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.c);
+                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
                     }
                 if(valore_letto.x >= MAXX-2)
                     {
