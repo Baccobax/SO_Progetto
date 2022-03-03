@@ -43,16 +43,7 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
 
     pos_nemico.up_down = true;
     while(pos_nemico.x > BRDDISTANCE)
-    {
-        /*while ( condition )
-        {
-            if(vite == 1)
-            {
-                modificamatrice();
-                flagcondizionewhile = false;
-            }
-        }*/
-        
+    {        
         usleep(500000);
         if(pos_nemico.up_down == true)
         {
@@ -63,24 +54,19 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
         {
             pos_nemico.y++;
             pos_nemico.up_down = true;
+            SparoNemici(pipeout , pos_nemico, column);
         }
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
         usleep(500000);
         pos_nemico.x--;
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
-
-        //read(pipein , &pos_nemico.life , sizeof(pos_nemico.life));
         if(pos_nemico.life <= 0)
         {
             _exit(SIGUSR1);
         }
         waitpid(pid_nem[cont] , status_nem[cont] , WNOHANG);
-        /*if (/* condition )
-        {
-            /* code 
-        }*/
     }
-}
+} 
 
 /**
  * @brief 
@@ -88,47 +74,35 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
  * @param pipeout 
  * @param nemico 
  */
-void SparoNemici(int pipeout , pos nemico)
+void SparoNemici(int pipeout , pos nemico , int column)
 {
-    int pid_pro_nem , status_pro_nem;
+    int pid_pro_nem , status_pro_nem = 0;
     bool flag_pro = false;
     pos pro_nem;
-    pro_nem.cp = '#';
-    if(flag_pro == false)
+    pro_nem.cp = '<';
+    flag_pro = true;
+    pid_pro_nem = fork();
+    switch(pid_pro_nem)
+
     {
-        flag_pro = true;
-        pid_pro_nem = fork();
-        switch(pid_pro_nem)
+        case -1:
+            perror("fork call");
+            _exit(2);
+            break;
+        case 0:
         {
-            case -1:
-                perror("fork call");
-                _exit(2);
-                break;
-            case 0:
+            pro_nem.x = (nemico.x-2 * column)-1;
+            pro_nem.y = nemico.y;
+            write(pipeout , &pro_nem , sizeof(pro_nem));
+            while(pro_nem.x >= BRDDISTANCE)
             {
-                pro_nem.x = nemico.x-1;
-                pro_nem.y = nemico.y;
+                usleep(25000);
+                pro_nem.x--;
                 write(pipeout , &pro_nem , sizeof(pro_nem));
-                while(pro_nem.x > 3)
-                {
-                    usleep(5000000);
-                    pro_nem.x--;
-                    write(pipeout , &pro_nem , sizeof(pro_nem));
-                }
-                usleep(5000000);
-                _exit(SIGUSR1);
             }
-            default:
-            {
-                break;
-            }
+            _exit(SIGUSR1);
         }
     }
     waitpid(pid_pro_nem , &status_pro_nem , WNOHANG);
-    if(status_pro_nem != 0)
-    {
-        flag_pro = false;
-        status_pro_nem = 0;
-    }
 }
 

@@ -25,7 +25,7 @@ void NavicellaGiocatore(int pipeout)
         {
             case KEY_UP:
             {
-                if(pos_navicella.y > 2)
+                if(pos_navicella.y > BRDDISTANCE)
                 {
                     pos_navicella.y -= 1;
                     write(pipeout , &pos_navicella , sizeof(pos_navicella));
@@ -34,7 +34,7 @@ void NavicellaGiocatore(int pipeout)
             }        
             case KEY_DOWN:
             {
-                if(pos_navicella.y < MAXY-3)
+                if(pos_navicella.y < MAXY-4)
                 {
                     pos_navicella.y += 1;
                     write(pipeout , &pos_navicella , sizeof(pos_navicella));
@@ -186,10 +186,10 @@ void collision(int pipein)
     proiettile.x =- 1;
 
 
-    border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
     refresh();
     do
     {
+        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
         read(pipein, &valore_letto, sizeof(valore_letto));
         switch(valore_letto.c[1][1]) //da correggere in modo da far controllare il carattere centrale
         {
@@ -197,13 +197,13 @@ void collision(int pipein)
             {
                 if(valore_letto.x > BRDDISTANCE)
                 {
-                    for(i=0; i<5; i++){
+                    for(i=0; i < 5; i++){
                         mvprintw(valore_letto.y+sy-1, valore_letto.x, "   ");
                         sy+=1;
                     }
                     
                     sy = -1;
-                    for(i=0; i < 3; i++)
+                    for(i=0; i < BRDDISTANCE; i++)
                     {
                         mvprintw(valore_letto.y+sy, valore_letto.x-1, valore_letto.c[i]);
                         sy += 1;
@@ -225,13 +225,13 @@ void collision(int pipein)
             {
                 if(Nav.x >= 0)
                     {
-                        for(i=0; i < 9; i++)
+                        for(i=0; i < 5; i++)
                         {
-                            mvprintw(valore_letto.y+sy-3, valore_letto.x, "   ");
+                            mvprintw(valore_letto.y+sy-1, valore_letto.x, "   ");
                             sy += 1;
                         }
                         sy=-1;
-                        for(i=0; i < 3; i++)
+                        for(i=0; i < BRDDISTANCE; i++)
                         {
                             mvprintw(valore_letto.y+sy, valore_letto.x, valore_letto.c[i]);
                             sy += 1;
@@ -245,11 +245,11 @@ void collision(int pipein)
         }
 
         switch(valore_letto.cp){
-            case('#'):  //Proiettile nemico
+            case('<'):  //Proiettile nemico
             {
-                if(valore_letto.x >= MAXX-BRDDISTANCE)
+                if(valore_letto.x <= MAXX-BRDDISTANCE)
                     {
-                        mvaddch(valore_letto.y , valore_letto.x+1, ' ');
+                        mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
                         mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
                     }
                 if(valore_letto.x <= BRDDISTANCE)
