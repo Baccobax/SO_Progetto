@@ -17,6 +17,7 @@ void NavicellaGiocatore(int pipeout)
     pos_proiettile_giu.cp = '\\';
     pos_proiettile_su.cp = '/';
     write(pipeout , &pos_navicella , sizeof(pos_navicella));
+    
 
     while(true)
     {
@@ -184,17 +185,21 @@ void collision(int pipein)
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
     proiettile.x =- 1;
-
-
+    pos coll_nem[NEMICI];
+    int nNav=0;
     refresh();
     do
     {
+        if(nNav==NEMICI){
+            nNav=0;
+        }
         border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
         read(pipein, &valore_letto, sizeof(valore_letto));
         switch(valore_letto.c[1][1]) //da correggere in modo da far controllare il carattere centrale
         {
             case('0'):  //Navicella nemica
             {
+                coll_nem[nNav]=valore_letto;
                 if(valore_letto.x > BRDDISTANCE)
                 {
                     for(i=0; i < 5; i++){
@@ -218,8 +223,10 @@ void collision(int pipein)
                     game_over = true;                   
                 }
                 Nem = valore_letto;
+                nNav++;
                 break;
             }
+            
             
             case('X'):  //Navicella
             {
@@ -247,15 +254,20 @@ void collision(int pipein)
         switch(valore_letto.cp){
             case('<'):  //Proiettile nemico
             {
-                if(valore_letto.x <= MAXX-BRDDISTANCE)
-                    {
-                        mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
-                        mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
+                for(i=0; i<NEMICI; i++){
+                    if(valore_letto.x!=coll_nem[i].x){
+                        mvprintw(15,15,"%d %d %d", coll_nem[i].y, coll_nem[i].x, i);
+                        if(valore_letto.x <= MAXX-BRDDISTANCE)
+                            {
+                                mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
+                                mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
+                            }
+                        if(valore_letto.x <= BRDDISTANCE)
+                            {
+                                mvaddch(valore_letto.y , valore_letto.x , ' ');                    
+                            }
                     }
-                if(valore_letto.x <= BRDDISTANCE)
-                    {
-                        mvaddch(valore_letto.y , valore_letto.x , ' ');                    
-                    }
+                }  
                 break;
             }
             case('+'):  //Proiettile base

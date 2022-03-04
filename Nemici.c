@@ -91,7 +91,7 @@ void SparoNemici(int pipeout , pos nemico , int column)
             break;
         case 0:
         {
-            pro_nem.x = (nemico.x-2 * column)-1;
+            pro_nem.x = nemico.x-3;
             pro_nem.y = nemico.y;
             write(pipeout , &pro_nem , sizeof(pro_nem));
             while(pro_nem.x >= BRDDISTANCE)
