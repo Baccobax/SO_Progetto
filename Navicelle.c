@@ -254,20 +254,26 @@ void collision(int pipein)
         switch(valore_letto.cp){
             case('<'):  //Proiettile nemico
             {
-                for(i=0; i<NEMICI; i++){
-                    if(valore_letto.x!=coll_nem[i].x){
-                        mvprintw(15,15,"%d %d %d", coll_nem[i].y, coll_nem[i].x, i);
-                        if(valore_letto.x <= MAXX-BRDDISTANCE)
-                            {
-                                mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
-                                mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
-                            }
-                        if(valore_letto.x <= BRDDISTANCE)
+                
+                                for(i=0; i<NEMICI; i++){
+                                    
+                                    if (valore_letto.x!=coll_nem[i].x||valore_letto.y!=coll_nem[i].y){
+                                        if(valore_letto.x <= MAXX-BRDDISTANCE)
+                                        {
+                                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
+                                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
+                                        }
+                                    }
+                                    if (valore_letto.x==coll_nem[i].x||valore_letto.y==coll_nem[i].y){
+                                        mvprintw(coll_nem[i].y, coll_nem[i].x-1, coll_nem[i].c[1]);
+                                    }
+                }
+                            
+                if(valore_letto.x <= BRDDISTANCE)
                             {
                                 mvaddch(valore_letto.y , valore_letto.x , ' ');                    
-                            }
-                    }
-                }  
+                            }            
+                  
                 break;
             }
             case('+'):  //Proiettile base
