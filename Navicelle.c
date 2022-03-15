@@ -195,7 +195,7 @@ void collision(int pipein)
         }
         border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
         read(pipein, &valore_letto, sizeof(valore_letto));
-        switch(valore_letto.c[1][1]) //da correggere in modo da far controllare il carattere centrale
+        switch(valore_letto.c[1][1])
         {
             case('0'):  //Navicella nemica
             {
@@ -254,25 +254,26 @@ void collision(int pipein)
         switch(valore_letto.cp){
             case('<'):  //Proiettile nemico
             {
-                
-                                for(i=0; i<NEMICI; i++){
-                                    
-                                    if (valore_letto.x!=coll_nem[i].x||valore_letto.y!=coll_nem[i].y){
-                                        if(valore_letto.x <= MAXX-BRDDISTANCE)
-                                        {
-                                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
-                                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
-                                        }
-                                    }
-                                    if (valore_letto.x==coll_nem[i].x||valore_letto.y==coll_nem[i].y){
-                                        mvprintw(coll_nem[i].y, coll_nem[i].x-1, coll_nem[i].c[1]);
-                                    }
-                }
+                for(i=0; i<NEMICI; i++){
+                    
+                    if (valore_letto.x != coll_nem[i].x ||
+                        valore_letto.y != coll_nem[i].y){
+                        if(valore_letto.x <= MAXX-BRDDISTANCE)
+                        {
+                            mvaddch(valore_letto.y , valore_letto.x+1 , ' ');
+                            mvaddch(valore_letto.y , valore_letto.x , valore_letto.cp);
+                        }
+                    }
+                    if (valore_letto.x == coll_nem[i].x ||
+                        valore_letto.y == coll_nem[i].y){
+                        mvprintw(coll_nem[i].y, coll_nem[i].x-1, coll_nem[i].c[1]);
+                    }
+            }
                             
                 if(valore_letto.x <= BRDDISTANCE)
-                            {
-                                mvaddch(valore_letto.y , valore_letto.x , ' ');                    
-                            }            
+                    {
+                        mvaddch(valore_letto.y , valore_letto.x , ' ');             
+                    }            
                   
                 break;
             }
