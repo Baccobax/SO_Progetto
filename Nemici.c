@@ -7,13 +7,14 @@
  * @param pidNem valore del pid collegato al processo del singolo nemico
  * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
  */
-void Nemici(int pipeout , int cont , int column , int *pid_nem)
+void Nemici(int pipeout , int pipein, int cont , int column , int *pid_nem)
 {
     int MAXX , MAXY , MIDY , statusPRO = 0 , mx , my , status_nem[NEMICI];
     getmaxyx(stdscr , MAXY , MAXX);
-    pos pos_nemico , pos_pro_nem;
+    pos pos_nemico , pos_pro_nem, valore_letto;
     pos_nemico.life = 2;
     pos_nemico.indice_oggetto = cont;
+    
     
     mx = cont/column;
 
@@ -34,6 +35,7 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
         pos_nemico.y = (MAXY/2) + 2 + my*2;
     }
 
+    pos_nemico.pidNav = pid_nem;
 
     strcpy(pos_nemico.c[0], " | ");
     strcpy(pos_nemico.c[1], "-0-");
@@ -45,6 +47,10 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
     while(pos_nemico.x > BRDDISTANCE)
     {        
         usleep(500000);
+        read(pipein, &valore_letto, sizeof(pos));
+        if(valore_letto.pidNav==pid_nem){
+            pos_nemico.life==valore_letto.life;
+        }
         if(pos_nemico.up_down == true)
         {
             pos_nemico.y--;
