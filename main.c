@@ -5,15 +5,16 @@ void main()
 {
     int tubo[2];
     int i = 0 , pidNav , status = 0 , column_nem , pidNem[NEMICI];
-    
+    srand((unsigned) time(NULL));
     
     
     initscr();
     noecho();
     curs_set(false);
     //sfondo();
+
     refresh();
-    column_nem = getmaxy(stdscr)*5 / 23; //numero di nemici
+    column_nem = getmaxy(stdscr)* 5 / 23; //numero di nemici
 
     if(pipe(tubo) == -1) //pipe fallisce
     {
@@ -50,12 +51,13 @@ void main()
                     case 0: //Processo singola Navicella nemica
                     {
                         close(tubo[0]);
-                        Nemici(tubo[1] , tubo[0],  i , column_nem , pidNem);
+                        Nemici(tubo[1] ,  i , column_nem , pidNem);
                         break;
                     }
                 }
             }
-            collision(tubo[0], tubo[1]);
+            close(tubo[1]);
+            collision(tubo[0]);
         }
     }
     while(wait(0) > 0);
