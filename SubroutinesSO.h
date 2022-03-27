@@ -22,6 +22,7 @@ typedef struct pos {
     bool up_down;
     int indice_oggetto;
     int life;
+    int pidNav;
 }pos;
 
 

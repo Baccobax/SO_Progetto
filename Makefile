@@ -1,5 +1,5 @@
-sobaka: main.o menu.o Navicelle.o Nemici.o 
-	cc main.o menu.o Navicelle.o Nemici.o -lncurses -o sobaka 
+sobaka: main.o menu.o Navicelle.o Nemici.o collision.o
+	cc main.o menu.o Navicelle.o Nemici.o collision.o -lncurses -o sobaka 
 
 main.o: Navicelle.o Nemici.o SubroutinesSO.h
 	cc -c main.c SubroutinesSO.h
@@ -12,6 +12,9 @@ Nemici.o: Nemici.c SubroutinesSO.h
 
 menu.o: menu.c SubroutinesSO.h
 	cc -c menu.c
+
+collision.o: collision.c SubroutinesSO.h
+	cc -c collision.c
 
 clean:
 	rm *.o
