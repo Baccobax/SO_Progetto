@@ -12,6 +12,7 @@
 #define MOVIMENTO 1     //Macro utilizzata per lo spostamento diagonale dei proiettili
 #define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
 #define UNDEFINED -2    //Macro utilizzata per la definizione degli array di PID (vedi più in "Navicelle.c")
+#define PROIETTILI 40
 
 /* Struttura per la comunicazione tra figli e padre */
 typedef struct pos {
@@ -21,7 +22,6 @@ typedef struct pos {
     int y; /* coordinata y */
     bool up_down;
     int indice_oggetto;
-    int life;
     int pidNav;
 }pos;
 
@@ -38,5 +38,5 @@ void caricamento();
 void settings();
 void NavicellaGiocatore();
 void Nemici();
-void SparoNemici();
+int SparoNemici();
 void collision();

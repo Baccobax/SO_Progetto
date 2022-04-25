@@ -11,7 +11,6 @@ void NavicellaGiocatore(int pipeout)
     strcpy(pos_navicella.c[1], "XXX");
     strcpy(pos_navicella.c[2], "XX ");
 
-    pos_navicella.life = 3;
     pos_navicella.x = 1;
     pos_navicella.y = MAXY/2;
     pos_proiettile.cp = '+';
