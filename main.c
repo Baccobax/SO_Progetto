@@ -11,7 +11,7 @@ void main()
     initscr();
     noecho();
     curs_set(false);
-    //sfondo();
+    sfondo();
 
     refresh();
     column_nem = getmaxy(stdscr)* 5 / 23; //numero di nemici
@@ -33,13 +33,13 @@ void main()
 
         case 0: /*Processo Navicella*/
         {
-            close(tubo[0]);
-            NavicellaGiocatore(tubo[1]);
+            close(tubo[LETTURA]);
+            NavicellaGiocatore(tubo[SCRITTURA]);
             _exit(SIGUSR1);
         }
         default:
         {    /* processo padre */
-            for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicella: il numero di navicelle dipende dalla macro NEMICI
+            for(i = 0; i < NEMICI ; i++) //ciclo per creare piu' navicelle: il numero di navicelle dipende dalla macro NEMICI
             {
                 pidNem[i] = fork();
                 
@@ -50,14 +50,14 @@ void main()
                         _exit(3);
                     case 0: //Processo singola Navicella nemica
                     {
-                        close(tubo[0]);
-                        Nemici(tubo[1] ,  i , column_nem , pidNem);
+                        close(tubo[LETTURA]);
+                        Nemici(tubo[SCRITTURA] ,  i , column_nem);
                         break;
                     }
                 }
             }
-            close(tubo[1]);
-            collision(tubo[0]);
+            close(tubo[SCRITTURA]);
+            collision(tubo[LETTURA]);
         }
     }
     while(wait(0) > 0);

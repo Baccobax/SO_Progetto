@@ -7,7 +7,7 @@
  * @param pidNem valore del pid collegato al processo del singolo nemico
  * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
  */
-void Nemici(int pipeout , int cont , int column , int *pid_nem)
+void Nemici(int pipeout , int cont , int column)
 {
     int MAXX , MAXY , MIDY , statusPRO = 0 , mx , my , status_pro_nem[PROIETTILI] , randP , pid_pro_nem[PROIETTILI] , i;
     getmaxyx(stdscr , MAXY , MAXX);
@@ -43,11 +43,9 @@ void Nemici(int pipeout , int cont , int column , int *pid_nem)
         pos_nemico.y = (MAXY/2) + 2 + my*2;
     }
 
-    pos_nemico.pidNav = pid_nem;
+    pos_nemico.pidNav = (int)getpid();
 
-    strcpy(pos_nemico.c[0], " | ");
-    strcpy(pos_nemico.c[1], "-0-");
-    strcpy(pos_nemico.c[2], " | ");
+    pos_nemico.status = Nav_Nemica;
 
     write(pipeout , &pos_nemico , sizeof(pos_nemico));
 
@@ -109,6 +107,7 @@ int SparoNemici(int pipeout , pos nemico , int column)
     bool flag_pro = false;
     pos pro_nem;
     pro_nem.cp = '<';
+    pro_nem.status = Proiettile;
     flag_pro = true;
     pid_pro_nem = fork();
     switch(pid_pro_nem)

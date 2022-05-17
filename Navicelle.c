@@ -7,10 +7,10 @@ void NavicellaGiocatore(int pipeout)
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
     pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su;
-    strcpy(pos_navicella.c[0], "XX ");
-    strcpy(pos_navicella.c[1], "XXX");
-    strcpy(pos_navicella.c[2], "XX ");
-
+    pos_navicella.status = Nav_Alleata;
+    pos_proiettile.status = Proiettile;
+    pos_proiettile_giu.status = Proiettile;
+    pos_proiettile_su.status = Proiettile;
     pos_navicella.x = 1;
     pos_navicella.y = MAXY/2;
     pos_proiettile.cp = '+';
@@ -60,6 +60,7 @@ void NavicellaGiocatore(int pipeout)
                         {
                             pos_proiettile.x = pos_navicella.x + 4;
                             pos_proiettile.y = pos_navicella.y;
+                            pos_proiettile.pidNav = getpid();
                             write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                             while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
                             {
@@ -90,6 +91,7 @@ void NavicellaGiocatore(int pipeout)
                         {
                             pos_proiettile_giu.x = pos_navicella.x + 4;
                             pos_proiettile_giu.y = pos_navicella.y-1;
+                            pos_proiettile_giu.pidNav = getpid();
                             write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
                             while(pos_proiettile_giu.x < MAXX - 2)
                             {
@@ -124,6 +126,7 @@ void NavicellaGiocatore(int pipeout)
                                 {
                                     pos_proiettile_su.x = pos_navicella.x + 4;
                                     pos_proiettile_su.y = pos_navicella.y - 1;
+                                    pos_proiettile_su.pidNav = getpid();
                                     write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
                                     while(pos_proiettile_su.x < MAXX - 2)
                                     {
