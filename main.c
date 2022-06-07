@@ -9,6 +9,7 @@ void main()
     
     
     initscr();
+    start_color();
     noecho();
     curs_set(false);
     sfondo();

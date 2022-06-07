@@ -1,5 +1,9 @@
 #include "SubroutinesSO.h"
-
+/**
+ * @brief 
+ * 
+ * @param pipeout 
+ */
 void NavicellaGiocatore(int pipeout)
 {
     int MAXY , MAXX , c , dyG = MOVIMENTO , dyS = -MOVIMENTO , pidPro , pidProS , pidProG , statusPRO = 0 , statusPROS = 0 , statusPROG = 0;
@@ -64,11 +68,11 @@ void NavicellaGiocatore(int pipeout)
                             write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                             while(pos_proiettile.x < MAXX - 2) // il proiettile si ferma subito prima del bordo
                             {
-                                usleep(50000);
+                                usleep(BULLET_SPEED);
                                 pos_proiettile.x++;
                                 write(pipeout , &pos_proiettile , sizeof(pos_proiettile));
                             }
-                            usleep(50000);
+                            usleep(35000);
                             _exit(SIGUSR1);
                         }
                     }
@@ -105,12 +109,12 @@ void NavicellaGiocatore(int pipeout)
                                     dyG = -MOVIMENTO;
                                     pos_proiettile_giu.cp = '/';
                                 }
-                                usleep(43000);
+                                usleep(BULLET_SPEED);
                                 pos_proiettile_giu.y += dyG;
                                 pos_proiettile_giu.x++;
                                 write(pipeout , &pos_proiettile_giu , sizeof(pos_proiettile_giu));
                             }
-                            usleep(50000);
+                            usleep(35000);
                             _exit(SIGUSR2);
                         }
                         default: //Proiettile di su 
@@ -140,12 +144,12 @@ void NavicellaGiocatore(int pipeout)
                                             dyS = -MOVIMENTO;
                                             pos_proiettile_su.cp = '/';
                                         }
-                                        usleep(43000);
+                                        usleep(BULLET_SPEED);
                                         pos_proiettile_su.y += dyS;
                                         pos_proiettile_su.x++;
                                         write(pipeout , &pos_proiettile_su , sizeof(pos_proiettile_su));
                                     }
-                                    usleep(50000);
+                                    usleep(35000);
                                     _exit(SIGUSR2);
                                 }
                             }

@@ -2,9 +2,8 @@
 
 
 void sfondo(){
-    //push
-    start_color();
     int MAXX, MAXY;
+    bool InizioGioco = false;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr,1);
     char stringa[4][30]={
@@ -21,7 +20,7 @@ void sfondo(){
     int frecciaMenu;
     freccia pointer;
     pointer.pos=(MAXY/2+2);
-    while(true) {
+    while(InizioGioco == false) {
 
         clear();
 
@@ -49,7 +48,9 @@ void sfondo(){
         mvprintw(MAXY/2+2, MAXX/2-sizeof(avvio)/2, avvio);
         mvprintw(MAXY/2+4, MAXX/2-sizeof(impostazioni)/2, impostazioni);
         mvprintw(MAXY/2+6, MAXX/2-sizeof(esci)/2, esci);
-
+        ///
+        mvprintw(MAXY/2+8, MAXX/2-sizeof(esci)/2, "%d %d" ,pointer.input , pointer.pos);
+        ///
         mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
         timeout(1);
 
@@ -57,31 +58,76 @@ void sfondo(){
         usleep(10000);
         switch(pointer.input){
             case KEY_UP:
-                if(pointer.pos>MAXY/2+2)
+                {
+                    if(pointer.pos>MAXY/2+2)
                     pointer.pos-=2;
-                break;
-            case KEY_DOWN:
-                if(pointer.pos<MAXY/2+6)
-                    pointer.pos+=2;
-                break;
-            case 113:
-                if (pointer.pos==MAXY/2+2){
-                   caricamento();
-                }else if(pointer.pos==MAXY/2+4){
-                    timeout(-1);
-                    settings();
+                    break;
                 }
-                else{
-                    endwin();
-                    exit(0);
+            case KEY_DOWN:
+                {
+                    if(pointer.pos<MAXY/2+6)
+                    pointer.pos+=2;
+                    break;
+                }
+            case ' ':
+                {
+                    if (pointer.pos==MAXY/2+2){
+                        InizioGioco = true;
+                        caricamento();
+                    }
+                    else if(pointer.pos==MAXY/2+4){
+                        timeout(-1);
+                        settings();
+                    }
+                    else{
+                        endwin();
+                        exit(0);
+                    }
+                    break;
                 }
         }
-
         refresh();
+    }
+    clear();
+}
+
+void GameOver(int MAXX , int MAXY)
+{
+char game_over[6][60]={
+            "  ____                         ___                  ",
+            " / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __ ",
+            "| |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__|",
+            "| |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |   ",
+            " \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|   ",
+    };
+    int g,y=1;
+    clear();
+    for(g=0;g<7;g++){
+        mvprintw((MAXY/2-7)+y,MAXX/2-25,"%s",game_over[g]);
+        y++;
+        refresh();
+        usleep(300000);
     }
 }
 
-
+void YouWin(int MAXX , int MAXY)
+{
+char you_win[6][45]={
+            "__   __                     _            ",
+            "\\ \\ / /__  _   _  __      _(_)_ __     ",
+            " \\ V / _ \\| | | | \\ \\ /\\ / / | '_ \\",
+            "  | | (_) | |_| |  \\ V  V /| | | | |   ",
+            "  |_|\\___/ \\__,_|   \\_/\\_/ |_|_| |_|",
+    };
+    int g,y=1;
+    clear();
+    for(g=0;g<7;g++){
+        mvprintw((MAXY/2-7)+y,MAXX/2-20,"%s",you_win[g]);
+        y++;
+        refresh();
+        usleep(300000);
+    }
+}
 
 void settings(){
     int MAXX, MAXY;
@@ -90,41 +136,20 @@ void settings(){
     pointer.pos=(MAXY/2+2);
     while(true){
         clear();
-        int i=0;
         int j;
         char impostazioni[] = "Impostazioni";
         char scolore[] = "Cambia colori";
-        char snav[] = "Cambia navicella";
         char back[] = "Torna al menu";
         char scegliScritta[] = "Scegli il colore della scritta";
         char scegliSfondo[] = "Scegli il colore dello sfondo";
-        char scegliNavicella[] = "Scegli la navicella";
         char colori[8][8]={"Nero   ", "Rosso  ", "Verde  ", "Giallo ", "Blu    ", "Magenta", "Ciano  ", "Bianco "};
         int asciiColori[8]={COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE};
         int coloreSfondo, coloreScritta;
 
         strcpy(pointer.stringa, "==>");
-        char nav1[4][7]={
-            " ____ ",
-            "|  . |",
-            "|    |",
-            "|__|_|"
-        };
-        char nav2[4][6]={
-            " _   ",
-            "| |_ ",
-            "|  _|",
-            "|_|  "
-        };
-        char nav3[4][7]={
-            "   ^  ",
-            "// _ \\",
-            "\\   //",
-            "   v  "
-        };
+
         mvprintw(MAXY/2+2, MAXX/2-sizeof(scolore)/2, scolore);
-        mvprintw(MAXY/2+4, MAXX/2-sizeof(snav)/2, snav);
-        mvprintw(MAXY/2+6, MAXX/2-sizeof(back)/2, back);
+        mvprintw(MAXY/2+4, MAXX/2-sizeof(back)/2, back);
 
         mvprintw(pointer.pos, MAXX/2-18, pointer.stringa);
 
@@ -133,21 +158,22 @@ void settings(){
             case KEY_UP:
                 if(pointer.pos>MAXY/2+2)
                     pointer.pos-=2;
-                break;
+                    break;
             case KEY_DOWN:
-                if(pointer.pos<MAXY/2+6)
+                if(pointer.pos<MAXY/2+4)
                     pointer.pos+=2;
-                break;
-            case 113:
-                if (pointer.pos==MAXY/2+2){
-                        while(i==0){
+                    break;
+            case ' ':
+                {
+                    if(pointer.pos==MAXY/2+2){
+                        while(true){
                             clear();
                             int c=-8;
                             for(j=0; j<8; j++){
                                 mvprintw(MAXY/2+c, MAXX/2-sizeof(colori[j])/2, colori[j]);
                                 c+=2;
                             }
-                            
+                             
                             mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliScritta)/2, scegliScritta);
                             mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
 
@@ -156,13 +182,13 @@ void settings(){
                             switch(pointer.input){
                                 case KEY_UP:
                                     if(pointer.pos>MAXY/2-8)
-                                        pointer.pos-=2;
+                                        {pointer.pos-=2;}
                                     break;
                                 case KEY_DOWN:
                                     if(pointer.pos<MAXY/2+6)
-                                        pointer.pos+=2;
+                                        {pointer.pos+=2;}
                                     break;
-                                case 'q': 
+                                case ' ': 
                                     c=-8;
                                     for(j=0; j<8; j++){
                                         if(pointer.pos==MAXY/2+c){
@@ -186,17 +212,17 @@ void settings(){
                                         switch(pointer.input){
                                             case KEY_UP:
                                                 if(pointer.pos>MAXY/2-8)
-                                                    pointer.pos-=2;
+                                                    {pointer.pos-=2;}
                                                 break;
                                             case KEY_DOWN:
                                                 if(pointer.pos<MAXY/2+6)
-                                                    pointer.pos+=2;
+                                                    {pointer.pos+=2;}
                                                 break;
-                                            case 'q': 
+                                            case ' ': 
                                                 c=-8;
                                                 for(j=0; j<8; j++){
                                                     if(pointer.pos==MAXY/2+c){
-                                                        coloreSfondo=asciiColori[j];
+                                                        {coloreSfondo=asciiColori[j];}
                                                     }
                                                     c+=2;
                                                 }
@@ -204,56 +230,21 @@ void settings(){
                                                 attron(COLOR_PAIR(1));
                                                 bkgd(COLOR_PAIR(1));
                                                 settings();
-                                            }
+                                                break;
+                                        }
                                     }
+                                break;
                             }                
                             refresh();        
                         };
-                }else if(pointer.pos==MAXY/2+4){
-                    pointer.pos=MAXY/2-7;
-                        while(true){
-                            clear();
-                            mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliNavicella)/2, scegliNavicella);
-                            int c=-8;
-                            
-                            for (j=0; j<4; j++){
-                                mvprintw(MAXY/2+c, MAXX/2, nav1[j]);
-                                c+=1;
-                            }
-                            c+=2;
-                            for (j=0; j<4; j++){
-                                mvprintw(MAXY/2+c, MAXX/2, nav2[j]);
-                                c+=1;
-                            }
-                            c+=2;
-                            for (j=0; j<4; j++){
-                                mvprintw(MAXY/2+c, MAXX/2, nav3[j]);
-                                c+=1;
-                            }
-                            
-                            mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
-                            
-                            pointer.input=getch();
-
-                            switch(pointer.input){
-                                case KEY_UP:
-                                    if(pointer.pos>MAXY/2-7)
-                                        pointer.pos-=6;
-                                    break;
-                                case KEY_DOWN:
-                                    if(pointer.pos<MAXY/2+5)
-                                        pointer.pos+=6;
-                                    break;
-                                case 'q':
-                                    settings();
-                            }    
-                            refresh();
-                        }
-                }else{
-                        sfondo();
                     }
+                    else{
+                            sfondo();
+                        }
+                    break;
+                }
 
-        }
+            }
 
         refresh();
     }
@@ -265,7 +256,7 @@ void settings(){
 void caricamento(){
     WINDOW *testo;
 
-    int MAXX, MAXY;
+    int MAXX, MAXY , i;
     getmaxyx(stdscr, MAXY, MAXX);
 
     testo = newwin(5, 20, MAXY/2-2, MAXX/2-10);
@@ -278,7 +269,7 @@ void caricamento(){
     int g;
 
     char caricamento[]="CARICAMENTO";
-    while (true) {
+    for(i = 0 ; i < 3 ; i++) {
 
         int x=1;
         int y,z;
@@ -305,8 +296,5 @@ void caricamento(){
             wrefresh(testo);
         }
     }
+    delwin(testo);
 }
-
-
-
-

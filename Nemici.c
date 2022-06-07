@@ -52,7 +52,7 @@ void Nemici(int pipeout , int cont , int column)
     pos_nemico.up_down = true;
     while(pos_nemico.x > BRDDISTANCE)
     {        
-        usleep(500000);
+        usleep(ENEMY_SPEED);
         if((rand() + (int)getpid() ) % 4 == 0)
         {
             for(i = 0 ; i < PROIETTILI ; i++)
@@ -77,7 +77,7 @@ void Nemici(int pipeout , int cont , int column)
             pos_nemico.up_down = true;
         }
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
-        usleep(500000);
+        usleep(ENEMY_SPEED);
         pos_nemico.x--;
         write(pipeout , &pos_nemico , sizeof(pos_nemico));
         for(i = 0 ; i < PROIETTILI ; i++)

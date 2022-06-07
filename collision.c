@@ -14,8 +14,9 @@
  */
 void collision(int pipein)
 {
+    usleep(69);
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto , Nem ,coll_nem[NEMICI];
-    int MAXY , MAXX, i, sy=-1 , nNav=0 , Nem_life[NEMICI] , Nav_life = 3 , Nem_status[NEMICI] , Pro_Status[3];
+    int MAXY , MAXX, i, Nem_counter = 0, sy=-1 , nNav=0 , Nem_life[NEMICI] , Nav_life = HEALTHY , Nem_status[NEMICI] , Pro_Status[3];
     bool game_over = false, victory = false; 
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
@@ -31,29 +32,57 @@ void collision(int pipein)
         Pro_Status[i] = 0;
     }
 
+    for(i = 0 ; i < NEMICI ; i++)
+    {
+        Nem_status[i] = 0;
+    }
+
     refresh();
     do
-    {  
+    {
         if(Nav_life == 0)
         {
             game_over = true;
         }
-        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
-        //
+        for(nNav = 0 ; nNav < NEMICI ; nNav++)
+        {
+            if(Nem_life[nNav] == DEATH)
+            {
+                if(Nem_status[nNav] == 0)
+                {
+                    kill(coll_nem[nNav].pidNav , SIGUSR1);
+                    waitpid(coll_nem[nNav].pidNav , &Nem_status[nNav] , WNOHANG);
+                    coll_nem[nNav].y = MAXY;
+                    coll_nem[nNav].x = MAXX;
+
+                }
+            }
+        }
         for(i = 0; i < NEMICI ; i++)
         {
-            mvprintw(20, 20+(i) , "%d", Nem_life[i]); //vite
+            if(Nem_status[i] == SIGUSR1)
+            {
+                Nem_counter++;                
+            }
+            if(Nem_counter == NEMICI)
+            {
+                victory = true;
+            }
         }
-        //
+        Nem_counter = 0;
+        
+        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
+        
+        
         read(pipein, &valore_letto, sizeof(valore_letto));
         nNav = valore_letto.indice_oggetto;
         switch(valore_letto.status)
         {
-            case(Nav_Nemica):  //Navicella nemica 
+            case(Nav_Nemica):  //Navicella nemica
             {
                 if(Nem_life[nNav] > DEATH)
                 {
-                    if(Nem_life[nNav] == HITTED)
+                    if(Nem_life[nNav] == HITTED || Nem_life[nNav] == ALMOST_DEAD)
                     {
                         valore_letto.status = Nav_Nemica_Rotta;
                     }
@@ -68,15 +97,21 @@ void collision(int pipein)
                         mvaddch(valore_letto.y , valore_letto.x , ' ');
                         game_over = true;   
                     }
-                    nNav++;
+                    if((nNav+1) < NEMICI)
+                    {
+                        nNav++;
+                    }
                 }
-                if(Nem_life[nNav] <= DEATH)
+                //debug information print/////////////////////////
+                /*for(i = 0; i < NEMICI ; i++)
                 {
-                    kill(coll_nem[nNav].pidNav , SIGUSR2);
-                    waitpid(coll_nem[nNav].pidNav , &Nem_status[nNav] , WNOHANG);
-                    coll_nem[nNav].y = MAXY;
-                    coll_nem[nNav].x = MAXX;
-                }
+                    mvprintw(22, 20 , "%d", Nem_counter);
+                    mvprintw(5+i, 20 , "%d", Nem_status[i]);
+                    /*mvprintw(18, 20+i , "%d", Nem_life[i]);
+                    /*if(nNav >= NEMICI)
+                        {mvprintw(16, 20 , "%d", nNav);}
+                }*/
+                /////////////////////////////////////////////////
                 break;
             }
             
@@ -115,10 +150,9 @@ void collision(int pipein)
                         
                         if(valore_letto.x == Nav.x+1 && (valore_letto.y == Nav.y || valore_letto.y == Nav.y+1 || valore_letto.y == Nav.y-1))
                         {
-                            //flash();
-                            //Nav_life--;
+                            flash();
+                            Nav_life--;
                         }
-
                         break;
                     }
                     case('+'):  //Proiettile base
@@ -138,8 +172,12 @@ void collision(int pipein)
                             if (valore_letto.x == coll_nem[i].x && (valore_letto.y == coll_nem[i].y || valore_letto.y == coll_nem[i].y+1 || valore_letto.y == coll_nem[i].y-1))
                             {
                                 Nem_life[i]--;
+                                if(Nem_life[i] < DEATH)
+                                {
+                                    Nem_life[i] = DEATH;
+                                }
                                 kill(valore_letto.pidNav , SIGUSR2);
-                                waitpid(valore_letto.pidNav , Pro_Status[PROIETTILE_DRITTO] , WNOHANG);
+                                waitpid(valore_letto.pidNav , &Pro_Status[PROIETTILE_DRITTO] , WNOHANG);
                                 if(Pro_Status[PROIETTILE_DRITTO] != 0)
                                 {
                                     Pro_Status[PROIETTILE_DRITTO] = 0;
@@ -166,8 +204,12 @@ void collision(int pipein)
                             if (valore_letto.x == coll_nem[i].x && (valore_letto.y == coll_nem[i].y || valore_letto.y == coll_nem[i].y+1 || valore_letto.y == coll_nem[i].y-1))
                             {
                                 Nem_life[i]--;
+                                if(Nem_life[i] < DEATH)
+                                {
+                                    Nem_life[i] = DEATH;
+                                }
                                 kill(valore_letto.pidNav , SIGUSR1);
-                                waitpid(valore_letto.pidNav , Pro_Status[PROIETTILE_IGIU] , WNOHANG);
+                                waitpid(valore_letto.pidNav , &Pro_Status[PROIETTILE_IGIU] , WNOHANG);
                                 if(Pro_Status[PROIETTILE_IGIU] != 0)
                                 {
                                     Pro_Status[PROIETTILE_IGIU] = 0;
@@ -193,8 +235,12 @@ void collision(int pipein)
                             if (valore_letto.x == coll_nem[i].x && (valore_letto.y == coll_nem[i].y || valore_letto.y == coll_nem[i].y+1 || valore_letto.y == coll_nem[i].y-1))
                             {
                                 Nem_life[i]--;
+                                if(Nem_life[i] < DEATH)
+                                {
+                                    Nem_life[i] = DEATH;
+                                }
                                 kill(valore_letto.pidNav , SIGUSR2);
-                                waitpid(valore_letto.pidNav , Pro_Status[PROIETTILE_ISU] , WNOHANG);
+                                waitpid(valore_letto.pidNav , &Pro_Status[PROIETTILE_ISU] , WNOHANG);
                                 if(Pro_Status[PROIETTILE_ISU] != 0)
                                 {
                                     Pro_Status[PROIETTILE_ISU] = 0;
@@ -208,10 +254,6 @@ void collision(int pipein)
                 break;
             }
         }
-
-        
-
-
         curs_set(false);
         refresh();
     } while(game_over == false && victory == false);
@@ -219,10 +261,18 @@ void collision(int pipein)
     flash();
     clear();
     refresh();
+    if(game_over == true)
+    {
+        GameOver(MAXX , MAXY);
+    }
+    else
+    {
+        YouWin(MAXX, MAXY);
+    }
 }
 
 /**
- * @brief Semplice subroutine che esegue un'operazione di cancellamento dei caratteri in un'area 3x4
+ * @brief Semplice subroutine che esegue un'operazione di cancellazione dei caratteri in un'area 3x4
  * 
  * @param Nav Variabile posizione dell'oggetto. Viene utilizzato per ottenere le coordinate del suddetto.
  * @param sy 
