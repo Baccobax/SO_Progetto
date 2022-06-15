@@ -17,6 +17,7 @@ void NavicellaGiocatore(int pipeout)
     pos_proiettile_su.status = Proiettile;
     pos_navicella.x = 1;
     pos_navicella.y = MAXY/2;
+    pos_navicella.pidNav = getpid();
     pos_proiettile.cp = '+';
     pos_proiettile_giu.cp = '\\';
     pos_proiettile_su.cp = '/';

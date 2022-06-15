@@ -20,9 +20,10 @@
 #define HEALTHY 3
 #define PROIETTILE_IGIU 2
 #define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
-#define NEMICI 10      //Macro dedicata al numero dei nemici
+#define NEMICI 16     //Macro dedicata al numero dei nemici
 #define BULLET_SPEED 10000
 #define ENEMY_SPEED 500000 //500000
+#define ENDGAMEWAIT 5000000 //Macro utilizzata per definire la durata della schermata finale
 
 
 
@@ -58,8 +59,9 @@ void settings();
 void NavicellaGiocatore();
 void Nemici();
 int SparoNemici();
-void collision();
+bool collision();
 void StampaNavicelle();
 void Cancella3x4();
 void GameOver();
 void YouWin();
+void EliminaNemici();

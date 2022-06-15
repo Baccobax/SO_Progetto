@@ -42,15 +42,10 @@ void sfondo(){
         }
         
         char avvio[] = "Avvia gioco";
-        char impostazioni[] = "Impostazioni";
         char esci[] = "Esci";
         strcpy(pointer.stringa, "==>");
         mvprintw(MAXY/2+2, MAXX/2-sizeof(avvio)/2, avvio);
-        mvprintw(MAXY/2+4, MAXX/2-sizeof(impostazioni)/2, impostazioni);
-        mvprintw(MAXY/2+6, MAXX/2-sizeof(esci)/2, esci);
-        ///
-        mvprintw(MAXY/2+8, MAXX/2-sizeof(esci)/2, "%d %d" ,pointer.input , pointer.pos);
-        ///
+        mvprintw(MAXY/2+4, MAXX/2-sizeof(esci)/2, esci);
         mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
         timeout(1);
 
@@ -65,7 +60,7 @@ void sfondo(){
                 }
             case KEY_DOWN:
                 {
-                    if(pointer.pos<MAXY/2+6)
+                    if(pointer.pos<MAXY/2+4)
                     pointer.pos+=2;
                     break;
                 }
@@ -74,10 +69,6 @@ void sfondo(){
                     if (pointer.pos==MAXY/2+2){
                         InizioGioco = true;
                         caricamento();
-                    }
-                    else if(pointer.pos==MAXY/2+4){
-                        timeout(-1);
-                        settings();
                     }
                     else{
                         endwin();
@@ -108,6 +99,7 @@ char game_over[6][60]={
         refresh();
         usleep(300000);
     }
+    usleep(ENDGAMEWAIT);
 }
 
 void YouWin(int MAXX , int MAXY)
@@ -127,131 +119,8 @@ char you_win[6][45]={
         refresh();
         usleep(300000);
     }
+    usleep(ENDGAMEWAIT);
 }
-
-void settings(){
-    int MAXX, MAXY;
-    getmaxyx(stdscr, MAXY, MAXX);
-    freccia pointer;
-    pointer.pos=(MAXY/2+2);
-    while(true){
-        clear();
-        int j;
-        char impostazioni[] = "Impostazioni";
-        char scolore[] = "Cambia colori";
-        char back[] = "Torna al menu";
-        char scegliScritta[] = "Scegli il colore della scritta";
-        char scegliSfondo[] = "Scegli il colore dello sfondo";
-        char colori[8][8]={"Nero   ", "Rosso  ", "Verde  ", "Giallo ", "Blu    ", "Magenta", "Ciano  ", "Bianco "};
-        int asciiColori[8]={COLOR_BLACK, COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_MAGENTA, COLOR_CYAN, COLOR_WHITE};
-        int coloreSfondo, coloreScritta;
-
-        strcpy(pointer.stringa, "==>");
-
-        mvprintw(MAXY/2+2, MAXX/2-sizeof(scolore)/2, scolore);
-        mvprintw(MAXY/2+4, MAXX/2-sizeof(back)/2, back);
-
-        mvprintw(pointer.pos, MAXX/2-18, pointer.stringa);
-
-        pointer.input=getch();
-        switch(pointer.input){
-            case KEY_UP:
-                if(pointer.pos>MAXY/2+2)
-                    pointer.pos-=2;
-                    break;
-            case KEY_DOWN:
-                if(pointer.pos<MAXY/2+4)
-                    pointer.pos+=2;
-                    break;
-            case ' ':
-                {
-                    if(pointer.pos==MAXY/2+2){
-                        while(true){
-                            clear();
-                            int c=-8;
-                            for(j=0; j<8; j++){
-                                mvprintw(MAXY/2+c, MAXX/2-sizeof(colori[j])/2, colori[j]);
-                                c+=2;
-                            }
-                             
-                            mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliScritta)/2, scegliScritta);
-                            mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
-
-                            pointer.input=getch();
-
-                            switch(pointer.input){
-                                case KEY_UP:
-                                    if(pointer.pos>MAXY/2-8)
-                                        {pointer.pos-=2;}
-                                    break;
-                                case KEY_DOWN:
-                                    if(pointer.pos<MAXY/2+6)
-                                        {pointer.pos+=2;}
-                                    break;
-                                case ' ': 
-                                    c=-8;
-                                    for(j=0; j<8; j++){
-                                        if(pointer.pos==MAXY/2+c){
-                                            coloreScritta=asciiColori[j];
-                                        }
-                                        c+=2;
-                                    }
-                                    while(true){
-                                        clear();
-                                        int c=-8;
-                                        for(j=0; j<8; j++){
-                                            mvprintw(MAXY/2+c, MAXX/2-sizeof(colori[j])/2, colori[j]);
-                                            c+=2;
-                                        }
-                                        
-                                        mvprintw(MAXY/2-10, MAXX/2-sizeof(scegliSfondo)/2, scegliSfondo);
-                                        mvprintw(pointer.pos, MAXX/2-10, pointer.stringa);
-
-                                        pointer.input=getch();
-
-                                        switch(pointer.input){
-                                            case KEY_UP:
-                                                if(pointer.pos>MAXY/2-8)
-                                                    {pointer.pos-=2;}
-                                                break;
-                                            case KEY_DOWN:
-                                                if(pointer.pos<MAXY/2+6)
-                                                    {pointer.pos+=2;}
-                                                break;
-                                            case ' ': 
-                                                c=-8;
-                                                for(j=0; j<8; j++){
-                                                    if(pointer.pos==MAXY/2+c){
-                                                        {coloreSfondo=asciiColori[j];}
-                                                    }
-                                                    c+=2;
-                                                }
-                                                init_pair(1, coloreScritta, coloreSfondo);
-                                                attron(COLOR_PAIR(1));
-                                                bkgd(COLOR_PAIR(1));
-                                                settings();
-                                                break;
-                                        }
-                                    }
-                                break;
-                            }                
-                            refresh();        
-                        };
-                    }
-                    else{
-                            sfondo();
-                        }
-                    break;
-                }
-
-            }
-
-        refresh();
-    }
-}
-
-
-
 
 void caricamento(){
     WINDOW *testo;

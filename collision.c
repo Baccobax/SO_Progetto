@@ -12,11 +12,11 @@
  * 
  * @param pipein 
  */
-void collision(int pipein)
+bool collision(int pipein)
 {
     usleep(69);
     pos Nav, proiettile, proiettileGIU , proiettileSU , valore_letto , Nem ,coll_nem[NEMICI];
-    int MAXY , MAXX, i, Nem_counter = 0, sy=-1 , nNav=0 , Nem_life[NEMICI] , Nav_life = HEALTHY , Nem_status[NEMICI] , Pro_Status[3];
+    int MAXY , MAXX, i, Nem_counter = 0, sy=-1 , nNav=0 , Nem_life[NEMICI] , Nav_life = HEALTHY , nav_status = 0 ,Nem_status[NEMICI] , Pro_Status[3] , game_again;
     bool game_over = false, victory = false; 
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
@@ -43,21 +43,12 @@ void collision(int pipein)
         if(Nav_life == 0)
         {
             game_over = true;
+            kill(Nav.pidNav , SIGUSR1);
+            waitpid(Nav.pidNav , &nav_status , WNOHANG);
         }
-        for(nNav = 0 ; nNav < NEMICI ; nNav++)
-        {
-            if(Nem_life[nNav] == DEATH)
-            {
-                if(Nem_status[nNav] == 0)
-                {
-                    kill(coll_nem[nNav].pidNav , SIGUSR1);
-                    waitpid(coll_nem[nNav].pidNav , &Nem_status[nNav] , WNOHANG);
-                    coll_nem[nNav].y = MAXY;
-                    coll_nem[nNav].x = MAXX;
 
-                }
-            }
-        }
+        EliminaNemici(nNav , coll_nem , Nem_status , Nem_life , MAXX , MAXY);
+
         for(i = 0; i < NEMICI ; i++)
         {
             if(Nem_status[i] == SIGUSR1)
@@ -102,16 +93,6 @@ void collision(int pipein)
                         nNav++;
                     }
                 }
-                //debug information print/////////////////////////
-                /*for(i = 0; i < NEMICI ; i++)
-                {
-                    mvprintw(22, 20 , "%d", Nem_counter);
-                    mvprintw(5+i, 20 , "%d", Nem_status[i]);
-                    /*mvprintw(18, 20+i , "%d", Nem_life[i]);
-                    /*if(nNav >= NEMICI)
-                        {mvprintw(16, 20 , "%d", nNav);}
-                }*/
-                /////////////////////////////////////////////////
                 break;
             }
             
@@ -152,6 +133,10 @@ void collision(int pipein)
                         {
                             flash();
                             Nav_life--;
+                            if(Nav_life < DEATH)
+                                {
+                                    Nav_life = DEATH;
+                                }
                         }
                         break;
                     }
@@ -263,11 +248,39 @@ void collision(int pipein)
     refresh();
     if(game_over == true)
     {
+        for(i = 0 ; i < NEMICI ; i++)
+        {
+            Nem_life[i] = DEATH; 
+        }
+        EliminaNemici(nNav , coll_nem , Nem_status , Nem_life , MAXX , MAXY);
+        kill(Nav.pidNav , SIGUSR1);
+        waitpid(Nav.pidNav , &nav_status , WNOHANG);
         GameOver(MAXX , MAXY);
     }
     else
     {
         YouWin(MAXX, MAXY);
+        kill(Nav.pidNav , SIGUSR1);
+        waitpid(Nav.pidNav , &nav_status , WNOHANG);
+    }
+    clear();
+    refresh();
+}
+
+void EliminaNemici(int nNav , pos *coll_nem , int *Nem_status , int *Nem_life , int MAXX , int MAXY)
+{
+    for(nNav = 0 ; nNav < NEMICI ; nNav++)
+    {
+        if(Nem_life[nNav] == DEATH)
+        {
+            if(Nem_status[nNav] == 0)
+            {
+                kill(coll_nem[nNav].pidNav , SIGUSR1);
+                waitpid(coll_nem[nNav].pidNav , &Nem_status[nNav] , WNOHANG);
+                coll_nem[nNav].y = MAXY;
+                coll_nem[nNav].x = MAXX;
+            }
+        }
     }
 }
 
@@ -309,17 +322,17 @@ void StampaNavicelle(pos Nav , int sy , int i, int nNav)
             strcpy(Sprite[2], "XX ");
 
             for(i=0; i < 5; i++)
-                {
-                    mvprintw(Nav.y+sy-1, Nav.x, "   ");
-                    sy += 1;
-                }
-                sy=-1;
-                for(i=0; i < BRDDISTANCE; i++)
-                {
-                    mvprintw(Nav.y+sy, Nav.x, Sprite[i]);
-                    sy += 1;
-                }
-                sy = -1;
+            {
+                mvprintw(Nav.y+sy-1, Nav.x, "   ");
+                sy += 1;
+            }
+            sy=-1;
+            for(i=0; i < BRDDISTANCE; i++)
+            {
+                mvprintw(Nav.y+sy, Nav.x, Sprite[i]);
+                sy += 1;
+            }
+            sy = -1;
             break;
         }
         case(Nav_Nemica):
