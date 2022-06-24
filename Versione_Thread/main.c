@@ -3,6 +3,8 @@
 /**
  * TODO
  * Sincronizzare l'intero programma
+ * Dopo che un nemico viene ucciso, tutti si fermano. Psossbile bug in generazione coordinate dopo che il thread scomapre, oppure solito errore di sincronizzazione.
+ * Potrebbe esssere causato da un controllo sull'indice dell'array, provare a implementare un controllo con lo status quando è morto. Possibile dover aggiungere un valore di enumerazione per tale stato.
  * 
  */
 
@@ -489,7 +491,7 @@ void collision()
         
         for(i = 0 ; i < NEMICI ; i++)
         {
-            usleep(1000);
+            usleep(5000);
             if(pos_pro_nem[i].x == Nav.x+1 && (pos_pro_nem[i].y == Nav.y || pos_pro_nem[i].y == Nav.y+1 || pos_pro_nem[i].y == Nav.y-1))
             {
 
@@ -522,14 +524,13 @@ void collision()
             {
                 usleep(750);
                 Nem_life[i]--;
+                pos_proiettile.x = MAXX;
+                pos_proiettile.y = MAXY;
                 if(Nem_life[i] < DEATH)
                 {
                     Nem_life[i] = DEATH;
                 }
-               /* if(pthread_join(threadProiettili[PROIETTILE_DRITTO] , NULL) != 0)
-                {
-                    exit(5);
-                }*/
+                pthread_cancel(threadProiettili[PROIETTILE_DRITTO]);
                 Cancella3x4(pos_proiettile , sy , i);
             }
         }
@@ -537,6 +538,8 @@ void collision()
         if(pos_proiettile_giu.x >= BRDDISTANCE)
             {
                 mvaddch(pos_proiettile_giu.y-1 , pos_proiettile_giu.x-1, ' ');
+                mvaddch(pos_proiettile_giu.y+1 , pos_proiettile_giu.x-1, ' ');
+                usleep(750);
                 mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , pos_proiettile_giu.cp);
             }
         if(pos_proiettile_giu.x >= MAXX-2)
@@ -565,6 +568,8 @@ void collision()
         if(pos_proiettile_su.x >= BRDDISTANCE)
         {
             mvaddch(pos_proiettile_su.y+1 , pos_proiettile_su.x-1, ' ');
+            mvaddch(pos_proiettile_su.y-1 , pos_proiettile_su.x-1, ' ');
+            usleep(750);
             mvaddch(pos_proiettile_su.y , pos_proiettile_su.x , pos_proiettile_su.cp);
         }
         if(pos_proiettile_su.x >= MAXX-2)
