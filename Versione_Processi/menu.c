@@ -1,6 +1,9 @@
 #include "SubroutinesSO.h"
 
-
+/**
+ * @brief Funzione che si occupa della stampa e della navigazione all'interno del menù principale
+ * 
+ */
 void sfondo(){
     int MAXX, MAXY;
     bool InizioGioco = false;
@@ -82,6 +85,12 @@ void sfondo(){
     clear();
 }
 
+/**
+ * @brief Funzione che si occupa della stampa della schermata di Game over
+ * 
+ * @param MAXX dimensione massima x dello schermo
+ * @param MAXY dimensione massima y dello schermo
+ */
 void GameOver(int MAXX , int MAXY)
 {
 char game_over[6][60]={
@@ -101,7 +110,12 @@ char game_over[6][60]={
     }
     usleep(ENDGAMEWAIT);
 }
-
+/**
+ * @brief Funzione che si occupa della stampa della schermata di vittoria
+ * 
+ * @param MAXX dimensione massima x dello schermo
+ * @param MAXY dimensione massima y dello schermo
+ */
 void YouWin(int MAXX , int MAXY)
 {
 char you_win[6][45]={
@@ -122,6 +136,10 @@ char you_win[6][45]={
     usleep(ENDGAMEWAIT);
 }
 
+/**
+ * @brief Funzione che si occupa della stampa della schermata di caricamento
+ * 
+ */
 void caricamento(){
     WINDOW *testo;
 

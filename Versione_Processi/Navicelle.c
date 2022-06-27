@@ -1,8 +1,8 @@
 #include "SubroutinesSO.h"
 /**
- * @brief 
+ * @brief Funzione che si occupa della generazione e modifica delle coordinate delle navicella. Si occupa anche generazione dei proiettili
  * 
- * @param pipeout 
+ * @param pipeout Pipe dove viene effettuata la scrittura delle varie coordinate
  */
 void NavicellaGiocatore(int pipeout)
 {

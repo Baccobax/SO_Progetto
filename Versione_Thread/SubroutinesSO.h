@@ -9,22 +9,23 @@
 #include <string.h>
 #include <pthread.h>
 
-#define DEATH 0
-#define PROIETTILE_DRITTO 0
-#define NAV 0
-#define COLL 1
-#define PROIETTILI 3
-#define PROIETTILE_ISU 1
+#define DEATH 0 // Macro utilizzata per definire la morte di un oggetto
+#define PROIETTILE_DRITTO 0 // Macro utilizzata per definire il proiettile dritto
+#define NAV 0 // Macro utilizzata per definire la funzione della navicella
+#define COLL 1 // Macro utilizzata per definire la funzione delle collisioni
+#define PROIETTILI 3 // Macro utilizzata per definire la dimensione dell'array di proiettili
+#define PROIETTILE_ISU 1 // Macro utilizzata per definire il proiettile che parte verso l'alto
 #define MOVIMENTO 1     //Macro utilizzata per lo spostamento diagonale dei proiettili
-#define ALMOST_DEAD 1
+#define ALMOST_DEAD 1 // Macro utilizzata per definire la vita del nemico quando è quasi deceduto
 #define NAVECOLL 2 //Macro utilizzata per l'indice dell'array di thread della navicella e della subroutine "collision"
-#define HITTED 2
-#define HEALTHY 3
-#define PROIETTILE_IGIU 2
+#define HITTED 2 // Macro utilizzata per definire che il nemico è stato colpito
+#define HEALTHY 3 // Macro utilizzata per definire la vita massima della navicella o di un nemico
+#define PROIETTILE_IGIU 2 // Macro utilizzata per definire il proiettile che parte verso il basso
 #define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
-#define NEMICI 3     //Macro dedicata al numero dei nemici
-#define BULLET_SPEED 30000 //Macro dedicata alla velocita' dei proiettili
-#define ENEMY_SPEED 500000 //500000
+#define NEMICI 10     //Macro dedicata al numero dei nemici
+#define BULLET_SPEED 95000 //Macro dedicata alla velocita' dei proiettili
+#define ENEMY_BULLET_SPEED 50000 //Macro dedicata alla velocita' dei proiettili dei nemici
+#define ENEMY_SPEED 1500000 //Macro dedicata alla velocita' dei nemici
 #define ENDGAMEWAIT 5000000 //Macro utilizzata per definire la durata della schermata finale
 
 

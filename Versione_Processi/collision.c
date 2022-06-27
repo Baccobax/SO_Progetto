@@ -1,16 +1,10 @@
 #include "SubroutinesSO.h"
 
-/**
- * @brief TODO
- * 
- * 
- */
-
 
 /**
- * @brief 
+ * @brief Funzione che si occupa delle varie stampe e gestisce le collisioni tra oggetti. Inoltre si occupa di eliminare determinati processi in caso di collisione.
  * 
- * @param pipein 
+ * @param pipein pipe aperta in lettura usata per la comunicazione tra processi
  */
 bool collision(int pipein)
 {
@@ -81,7 +75,7 @@ bool collision(int pipein)
                     
                     if(coll_nem[nNav].x > BRDDISTANCE)
                     {
-                        StampaNavicelle(valore_letto , sy , i , nNav);
+                        StampaNavicelle(valore_letto , sy , i);
                     }
                     if(valore_letto.x <= BRDDISTANCE)
                     {
@@ -101,7 +95,7 @@ bool collision(int pipein)
             {
                 if(Nav.x >= 0)
                 {
-                    StampaNavicelle(valore_letto , sy , i , nNav);
+                    StampaNavicelle(valore_letto , sy , i);
                 }
                 Nav = valore_letto;
                 break;
@@ -288,7 +282,7 @@ void EliminaNemici(int nNav , pos *coll_nem , int *Nem_status , int *Nem_life , 
  * @brief Semplice subroutine che esegue un'operazione di cancellazione dei caratteri in un'area 3x4
  * 
  * @param Nav Variabile posizione dell'oggetto. Viene utilizzato per ottenere le coordinate del suddetto.
- * @param sy 
+ * @param sy variabile utilizzata per indicare una traslazione sull'asse y in cui effettuare la cancellazione
  * @param i Contatore i utilizzato nel ciclo.
  */
 void Cancella3x4(pos Nav , int sy , int i)
@@ -310,7 +304,7 @@ void Cancella3x4(pos Nav , int sy , int i)
  * @param i 
  * @param nNav 
  */
-void StampaNavicelle(pos Nav , int sy , int i, int nNav)
+void StampaNavicelle(pos Nav , int sy , int i)
 {
     char Sprite[3][4];
     switch(Nav.status)

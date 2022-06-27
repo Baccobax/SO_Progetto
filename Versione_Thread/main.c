@@ -1,17 +1,12 @@
 #include "SubroutinesSO.h"
 
-/**
- * TODO
- * Sincronizzare l'intero programma
- * Dopo che un nemico viene ucciso, tutti si fermano. Psossbile bug in generazione coordinate dopo che il thread scomapre, oppure solito errore di sincronizzazione.
- * Potrebbe esssere causato da un controllo sull'indice dell'array, provare a implementare un controllo con lo status quando è morto. Possibile dover aggiungere un valore di enumerazione per tale stato.
- * 
- */
+
 
 pthread_t threadNemici[NEMICI], threadNavEColl[NAVECOLL] , threadProiettili[PROIETTILI] , threadProiettiliNemici[NEMICI];
 pthread_mutex_t mutex;
-pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su , pos_nemico[NEMICI] , pos_pro_nem[NEMICI];
-int cont;
+pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su , pos_nemico[NEMICI] , pos_pro_nem[NEMICI/2];
+int cont = 0;
+bool j_pro = false , i_pro = false;
 
 void main()
 {
@@ -23,9 +18,8 @@ void main()
     initscr();
     noecho();
     curs_set(false);
-    //sfondo();
+    sfondo();
 
-    //refresh();
     
     
     if(pthread_create(&threadNavEColl[NAV], NULL, NavicellaGiocatore, NULL) != 0)
@@ -39,8 +33,9 @@ void main()
 
     for (i = 0; i < NEMICI ; i++) 
     {
-        usleep(1000);
+        usleep(100);
         *contatore = i;
+        cont = i;
         if (pthread_create(&threadNemici[i], NULL, Nemici, contatore) != 0) 
         {
             perror("Failed to create enemy thread");
@@ -49,33 +44,21 @@ void main()
     }
 
     collision();
-    /*
 
-    for (i = 0; i < NAV; i++) 
-        {
-            if (pthread_join(threadNavEColl[i], NULL) != 0) 
-            {
-                perror("Failed to join thread");
-            }
-        }
-        for (i = 0; i < NEMICI; i++)
-        {
-            if (pthread_join(threadNemici[i], NULL) != 0) 
-            {
-                perror("Failed to join thread");
-            }
-        }
-    */
+
     endwin();
     pthread_mutex_destroy(&mutex);
     exit(0);  
 }
 
-
+/**
+ * @brief Funzione che si occupa della generazione e modifica delle coordinate delle navicella. Si occupa anche generazione dei proiettili
+ * 
+ * @return void* 
+ */
 void *NavicellaGiocatore()
 {
     int c , MAXX , MAXY;
-    bool i = false , j = false;
     getmaxyx(stdscr, MAXY, MAXX);
     keypad(stdscr , true);
     pthread_mutex_lock(&mutex);
@@ -118,9 +101,9 @@ void *NavicellaGiocatore()
             }
             case 'x':
             {
-                if(i == false)
+                if(i_pro == false)
                 {
-                    i = true;
+                    i_pro = true;
                     if(pthread_create(&threadProiettili[PROIETTILE_DRITTO], NULL, &Proiettile_dritto, NULL) != 0)
                     {
                         perror("Failed to create straight projectile thread");
@@ -128,12 +111,12 @@ void *NavicellaGiocatore()
                     }
                 }
             }
-                    break;
+                break;
             case ' ':
             {
-                if(j == false)
+                if(j_pro == false)
                 {
-                    j = true;
+                    j_pro = true;
                     if(pthread_create(&threadProiettili[PROIETTILE_IGIU], NULL, &Proiettili_giu, NULL) != 0)
                     {
                         perror("Failed to create downward projectile thread");
@@ -150,29 +133,34 @@ void *NavicellaGiocatore()
         }
 
 
-        if(i == true && (pos_proiettile.x >= MAXX - 2))
+        if(i_pro == true && (pos_proiettile.x >= MAXX - 2))
         {
-            i = false;
-            if (pthread_join(threadProiettili[PROIETTILE_DRITTO], NULL) != 0) 
-            {
-                exit(5);
-            }
+            i_pro = false;
+            pthread_cancel(threadProiettili[PROIETTILE_DRITTO]);
+            pthread_mutex_lock(&mutex);
+            pos_proiettile.x = -1;
+            pthread_mutex_unlock(&mutex);
         }
-        if(j == true && pos_proiettile_giu.x >= MAXX - 2 && pos_proiettile_su.x >= MAXX - 2)
+        if(j_pro == true && pos_proiettile_giu.x >= MAXX - 2 && pos_proiettile_su.x >= MAXX - 2)
         {
-            j = false;
-            if (pthread_join(threadProiettili[PROIETTILE_ISU], NULL) != 0) 
-            {
-                exit(5);
-            }
-            if (pthread_join(threadProiettili[PROIETTILE_IGIU], NULL) != 0) 
-            {
-                exit(5);
-            }
+            j_pro = false;
+            pthread_mutex_lock(&mutex);
+            pos_proiettile_giu.y = -1;
+            pos_proiettile_giu.x = -1;
+            pos_proiettile_su.y = -1;
+            pos_proiettile_su.x = -1;
+            pthread_mutex_unlock(&mutex);
+            pthread_cancel(threadProiettili[PROIETTILE_ISU]);
+            pthread_cancel(threadProiettili[PROIETTILE_IGIU]);
         }
     }
 }
 
+/**
+ * @brief Funzione che si occupa della generazione dei proiettili in senso orizzontale
+ * 
+ * @return void* 
+ */
 void *Proiettile_dritto()
 {
     int MAXX = getmaxx(stdscr);
@@ -191,6 +179,11 @@ void *Proiettile_dritto()
     usleep(35000);
 }
 
+/**
+ * @brief Funzione che si occupa della generazione dei proiettili in senso diagonale che partono verso il basso
+ * 
+ * @return void* 
+ */
 void *Proiettili_giu()
 {
     int dyG = MOVIMENTO , MAXY , MAXX;
@@ -198,6 +191,7 @@ void *Proiettili_giu()
     pthread_mutex_lock(&mutex);
     pos_proiettile_giu.x = pos_navicella.x + 4;
     pos_proiettile_giu.y = pos_navicella.y-1;
+    pos_proiettile_giu.cp = '\\';
     pthread_mutex_unlock(&mutex);
     
     while(pos_proiettile_giu.x < MAXX - 2)
@@ -225,11 +219,17 @@ void *Proiettili_giu()
     usleep(35000);
 }
 
+/**
+ * @brief Funzione che si occupa della generazione dei proiettili in senso diagonale che partono verso l'alto
+ * 
+ * @return void* 
+ */
 void *Proiettili_su()
 {   
     int dyS = -MOVIMENTO, MAXY , MAXX;
     getmaxyx(stdscr, MAXY, MAXX);
     pthread_mutex_lock(&mutex);
+    pos_proiettile_su.cp = '/';
     pos_proiettile_su.x = pos_navicella.x + 4;
     pos_proiettile_su.y = pos_navicella.y - 1;
     pthread_mutex_unlock(&mutex);
@@ -260,24 +260,25 @@ void *Proiettili_su()
     usleep(35000);
 }
 
-///////////////////////////
 
-
-//Da Modificare
+/**
+ * @brief Funzione che si occupa della generazione e modifica delle coordinate dei nemici. Inoltre si occupa della generazione dei proiettili nemici
+ * 
+ * @param contatore contatore che indica l'indice dei nemici generati. Viene incrementato ogni volta che viene generato un nuovo nemico e viene usato per la generazione dei proiettili nemici.
+ * @return void* 
+ */
 void *Nemici(void *contatore)
 {
     int MAXX , MAXY , MIDY , mx , my , randP , i , cont_nemici = *(int*)contatore , *indice_da_passare = malloc(sizeof(int));
     getmaxyx(stdscr , MAXY , MAXX);
-    int column_nem = getmaxy(stdscr)* 5 / 23;
+    int column_nem = getmaxy(stdscr)* 5 / 23; //column_nem = numero di colonne in cui dividere i nemici. questo calcolo permette di adattare le colonne in base alla grandezza dello schermo
+
     pthread_mutex_lock(&mutex);
     *indice_da_passare = cont_nemici;
-
-    
-
     pthread_mutex_unlock(&mutex);
 
-    mx = cont_nemici/column_nem;
-    my = cont_nemici % column_nem;
+    mx = cont_nemici/column_nem; //variabile utilizzata per impostare di volta in volta in base al loro indice la posizione x dei nemici
+    my = cont_nemici % column_nem; //variabile utilizzata per impostare di volta in volta in base al loro indice la posizione y dei nemici
 
     pos_nemico[cont_nemici].indice_oggetto = cont_nemici;
     pos_nemico[cont_nemici].x = MAXX - BRDDISTANCE - ((BRDDISTANCE+1)*mx);
@@ -300,12 +301,16 @@ void *Nemici(void *contatore)
 
     pos_nemico[cont_nemici].up_down = true;
     pthread_mutex_unlock(&mutex);
-    while(pos_nemico[cont_nemici].x > BRDDISTANCE)
+
+    while(cont != NEMICI-1)
+    {usleep(500);}
+
+    while(pos_nemico[cont_nemici].x > BRDDISTANCE && cont == NEMICI-1)
     {        
         usleep(ENEMY_SPEED);
-        if((rand() + rand() ) % 11 == 0)
+        if((rand() + rand() ) % 2 == 0)
         {
-            if((rand() + rand() ) % 19 == 0)
+            if((rand() + rand() ) % 2 == 0)
             {    
                 if(pthread_create(&threadProiettiliNemici[cont_nemici], NULL, &SparoNemici, indice_da_passare) != 0)
                 {
@@ -336,6 +341,10 @@ void *Nemici(void *contatore)
     }
 }
 
+/**
+ * @brief Funzione che si occupa di inizializzare lo status dei proiettili nemici.
+ * 
+ */
 void InizializzaProiettiliNemici()
 {
     int i;
@@ -347,10 +356,17 @@ void InizializzaProiettiliNemici()
     }
 }
 
+
+/**
+ * @brief Funzione che si occupa di generare i proiettili nemici e di modificare le sue coordinate.
+ * 
+ * @param arg indice del nemico utilizzato per identificare il nemico che spara il proiettile.
+ * @return void* 
+ */
 void *SparoNemici(void *arg)
 {
     int i , indice_nemico = *(int*)arg;
-    for(i = 0 ; i < NEMICI ; i++)
+    for(i = 0 ; i < NEMICI/2 ; i++)
     {
         if(pos_pro_nem[i].status == Proiettile_Morto)
         {
@@ -360,27 +376,31 @@ void *SparoNemici(void *arg)
             pos_pro_nem[i].x = pos_nemico[indice_nemico].x-3;
             pos_pro_nem[i].y = pos_nemico[indice_nemico].y;
             pthread_mutex_unlock(&mutex);
-            while(pos_pro_nem[i].x >= BRDDISTANCE)
+            while(pos_pro_nem[i].x >= BRDDISTANCE-1)
             {
-                usleep(25000);
+                usleep(ENEMY_BULLET_SPEED);
                 pthread_mutex_lock(&mutex);
                 pos_pro_nem[i].x--;
                 pthread_mutex_unlock(&mutex);
             }
             pthread_mutex_lock(&mutex);
             pos_pro_nem[i].status = Proiettile_Morto;
+            pos_pro_nem[i].x = -2;
             pthread_mutex_unlock(&mutex);
         }
     }
 }
 
 
-///////////////////////////
 
-
+/**
+ * @brief Funzione che si occupa delle varie stampe e gestisce le collisioni tra oggetti. Inoltre si occupa di eliminare determinati thread in caso di collisione.
+ * 
+ */
 void collision()
 {
-    usleep(10000);
+    usleep(1000);
+    curs_set(false);
     pos Nav, proiettile, proiettileGIU , proiettileSU , Nem;
     int MAXY , MAXX, i, Nem_counter = 0, sy = -1 , nNav = 0 , Nem_life[NEMICI] , Nav_life = 99;
     bool game_over = false, victory = false; 
@@ -396,13 +416,10 @@ void collision()
     refresh();
     do
     {
-        if(Nav_life == 0)
+        if(Nav_life == DEATH)
         {
             game_over = true;
-            if(pthread_join(threadNavEColl[NAV], NULL) != 0) 
-            {
-                exit(5);
-            }
+            pthread_cancel(threadNavEColl[NAV]);
         }
 
         EliminaNemici(nNav , pos_nemico , Nem_life , MAXX , MAXY);
@@ -420,62 +437,50 @@ void collision()
         }
         Nem_counter = 0;
         
-        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
-        
-        nNav = pos_nemico[nNav].indice_oggetto;
         
         //Navicella Nemica
         usleep(1000);
-        pthread_mutex_lock(&mutex);
-        if(Nem_life[nNav] > DEATH)
+        for(nNav = 0 ; nNav < NEMICI ; nNav++)
         {
-            for(i = 0 ; i < NEMICI ; i++)
+            if(Nem_life[nNav] >= DEATH)
             {
-                mvprintw(3+i , 10 , "%d %d" , pos_nemico[i].x , pos_nemico[i].y);
-                mvprintw(3+i , 16 , "%d" , Nem_life[i]);
-                mvprintw(20 , 10 , "%d " , nNav);
-            }
-            if(Nem_life[nNav] == HITTED || Nem_life[nNav] == ALMOST_DEAD)
-            {
-                pos_nemico[nNav].status = Nav_Nemica_Rotta;
-            }
-            
-            if(pos_nemico[nNav].x > BRDDISTANCE)
-            {
-                StampaNavicelle(pos_nemico[nNav] , sy , i , nNav);
-            }
-            if(pos_nemico[nNav].x <= BRDDISTANCE)
-            {
-                mvaddch(pos_nemico[nNav].y , pos_nemico[nNav].x , ' ');
-                //game_over = true;
-            }
-            
-            nNav++;
-            
-            if(nNav == NEMICI)
-            {
-                nNav = 0;
+                if(Nem_life[nNav] == HITTED || Nem_life[nNav] == ALMOST_DEAD)
+                {
+                    pos_nemico[nNav].status = Nav_Nemica_Rotta;
+                }
+                
+                if(pos_nemico[nNav].x > BRDDISTANCE)
+                {
+                    StampaNavicelle(pos_nemico[nNav] , sy , i);
+                }
+                if(pos_nemico[nNav].x <= BRDDISTANCE)
+                {
+                    mvaddch(pos_nemico[nNav].y , pos_nemico[nNav].x , ' ');
+                    game_over = true;
+                }
             }
         }
-        pthread_mutex_unlock(&mutex);
+
          
         //Navicella giocatore
-        pthread_mutex_lock(&mutex);
         Nav = pos_navicella;
         if(Nav.x >= 0 && Nav_life > DEATH)
         {
-            StampaNavicelle(Nav , sy , i , nNav);
+            StampaNavicelle(Nav , sy , i);
         }
-        pthread_mutex_unlock(&mutex);
+
         
         //Proiettile nemico
+        usleep(1000);
+        
         for(i=0; i<NEMICI; i++)
         {
             if (pos_pro_nem[i].x!=pos_nemico[i].x||pos_pro_nem[i].y!=pos_nemico[i].y)
             {
                 if(pos_pro_nem[i].x <= MAXX-BRDDISTANCE)
                 {
-                    mvaddch(pos_pro_nem[i].y , pos_pro_nem[i].x+1 , ' ');
+                    mvprintw(pos_pro_nem[i].y , pos_pro_nem[i].x+1 , "     ");
+                    usleep(750);
                     mvaddch(pos_pro_nem[i].y , pos_pro_nem[i].x , pos_pro_nem[i].cp);
                 }
             }
@@ -483,10 +488,11 @@ void collision()
              
         for(i = 0 ; i < NEMICI ; i++)
         {
+            usleep(750);
             if(pos_pro_nem[i].x <= BRDDISTANCE)
             {
                 mvaddch(pos_pro_nem[i].y , pos_pro_nem[i].x , ' ');                    
-            } 
+            }
         }           
         
         for(i = 0 ; i < NEMICI ; i++)
@@ -494,8 +500,6 @@ void collision()
             usleep(5000);
             if(pos_pro_nem[i].x == Nav.x+1 && (pos_pro_nem[i].y == Nav.y || pos_pro_nem[i].y == Nav.y+1 || pos_pro_nem[i].y == Nav.y-1))
             {
-
-                flash();
                 Nav_life--;
                 if(Nav_life < DEATH)
                 {
@@ -508,7 +512,7 @@ void collision()
         usleep(1000);
         if(pos_proiettile.x >= BRDDISTANCE)
         {
-            mvaddch(pos_proiettile.y , pos_proiettile.x-1, ' ');
+            mvprintw(pos_proiettile.y , pos_proiettile.x-3, "   ");
             usleep(750);
             mvaddch(pos_proiettile.y , pos_proiettile.x , pos_proiettile.cp);
         }
@@ -524,8 +528,9 @@ void collision()
             {
                 usleep(750);
                 Nem_life[i]--;
-                pos_proiettile.x = MAXX;
-                pos_proiettile.y = MAXY;
+                pos_proiettile.x = -1;
+                pos_proiettile.y = -1;
+                i_pro = false;
                 if(Nem_life[i] < DEATH)
                 {
                     Nem_life[i] = DEATH;
@@ -535,15 +540,20 @@ void collision()
             }
         }
         //Proiettile che va giù
+        usleep(1000);
         if(pos_proiettile_giu.x >= BRDDISTANCE)
+        {
+            for(i = 1 ; i < BRDDISTANCE ; i++)
             {
-                mvaddch(pos_proiettile_giu.y-1 , pos_proiettile_giu.x-1, ' ');
-                mvaddch(pos_proiettile_giu.y+1 , pos_proiettile_giu.x-1, ' ');
-                usleep(750);
-                mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , pos_proiettile_giu.cp);
+                mvaddch(pos_proiettile_giu.y+i , pos_proiettile_giu.x-i, ' ');
+                mvaddch(pos_proiettile_giu.y-i , pos_proiettile_giu.x-i, ' ');
             }
+            usleep(750);
+            mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , pos_proiettile_giu.cp);
+        }
         if(pos_proiettile_giu.x >= MAXX-2)
             {
+                usleep(750);
                 mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , ' ');                    
             }
 
@@ -551,24 +561,29 @@ void collision()
         {
             if (pos_proiettile_giu.x == pos_nemico[i].x && (pos_proiettile_giu.y == pos_nemico[i].y || pos_proiettile_giu.y == pos_nemico[i].y+1 || pos_proiettile_giu.y == pos_nemico[i].y-1))
             {
+                usleep(750);
                 Nem_life[i]--;
                 if(Nem_life[i] < DEATH)
                 {
                     Nem_life[i] = DEATH;
                 }
-                if(pthread_join(threadProiettili[PROIETTILE_IGIU] , NULL) != 0)
-                {
-                    exit(5);
-                }
+                pthread_cancel(threadProiettili[PROIETTILE_IGIU]);
                 Cancella3x4(pos_proiettile_giu , sy , i);
+                pos_proiettile_giu.y = -1;
+                pos_proiettile_giu.x = -1;
+                j_pro = false;
             }
         }   
         
         //Proiettile che va su
+        usleep(1000);
         if(pos_proiettile_su.x >= BRDDISTANCE)
         {
-            mvaddch(pos_proiettile_su.y+1 , pos_proiettile_su.x-1, ' ');
-            mvaddch(pos_proiettile_su.y-1 , pos_proiettile_su.x-1, ' ');
+            for(i = 1 ; i < BRDDISTANCE ; i++)
+            {
+                mvaddch(pos_proiettile_su.y+i , pos_proiettile_su.x-i, ' ');
+                mvaddch(pos_proiettile_su.y-i , pos_proiettile_su.x-i, ' ');
+            }
             usleep(750);
             mvaddch(pos_proiettile_su.y , pos_proiettile_su.x , pos_proiettile_su.cp);
         }
@@ -580,18 +595,20 @@ void collision()
         {
             if (pos_proiettile_su.x == pos_nemico[i].x && (pos_proiettile_su.y == pos_nemico[i].y || pos_proiettile_su.y == pos_nemico[i].y+1 || pos_proiettile_su.y == pos_nemico[i].y-1))
             {
+                usleep(750);
                 Nem_life[i]--;
                 if(Nem_life[i] < DEATH)
                 {
                     Nem_life[i] = DEATH;
                 }
-                if(pthread_join(threadProiettili[PROIETTILE_ISU] , NULL) != 0)
-                {
-                    exit(5);
-                }
+                pthread_cancel(threadProiettili[PROIETTILE_ISU]);
                 Cancella3x4(pos_proiettile_su , sy , i);
+                pos_proiettile_su.y = -1;
+                pos_proiettile_su.x = -1;
+                j_pro = false;
             }
         }
+        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
         refresh();
     } while(game_over == false && victory == false);
     beep();
@@ -600,29 +617,33 @@ void collision()
     refresh();
     if(game_over == true)
     {
+        GameOver(MAXX , MAXY);
         for(i = 0 ; i < NEMICI ; i++)
         {
             Nem_life[i] = DEATH; 
         }
         EliminaNemici(nNav , pos_nemico, Nem_life , MAXX , MAXY);
-        if(pthread_join(threadNavEColl[NAV] , NULL) != 0)
-        {
-            exit(5);
-        }
-        GameOver(MAXX , MAXY);
+        pthread_cancel(threadNavEColl[NAV]);
     }
     else
     {
         YouWin(MAXX, MAXY);
-        if(pthread_join(threadNavEColl[NAV] , NULL) != 0)
-        {
-            exit(5);
-        }
+        pthread_cancel(threadNavEColl[NAV]);
     }
     clear();
     refresh();
 }
 
+
+/**
+ * @brief Funzione che si occupa dell'eliminazione dei thread dei nemici e della loro cancellazione dallo schermo
+ * 
+ * @param nNav Variabile utilizzata come contatore
+ * @param coll_nem puntatore che contiene l'array dei nemici eventualmente da eliminare
+ * @param Nem_life puntatore che contiene l'array della vita dei nemici per sapere quali nemici eliminare
+ * @param MAXX dimensione massima dello schermo in base ai valori di x
+ * @param MAXY dimensione massima dello schermo in base ai valori di y
+ */
 void EliminaNemici(int nNav , pos *coll_nem , int *Nem_life , int MAXX , int MAXY)
 {
     for(nNav = 0 ; nNav < NEMICI ; nNav++)
@@ -630,20 +651,25 @@ void EliminaNemici(int nNav , pos *coll_nem , int *Nem_life , int MAXX , int MAX
         usleep(1000);
         if(Nem_life[nNav] == DEATH)
         {
-        /*if (pthread_join(threadNemici[nNav], NULL) != 0) 
-        {
-            exit(2);
-        }*/
+        pthread_cancel(threadNemici[nNav]);
+        Cancella3x4(coll_nem[nNav] , MAXY , nNav);
         coll_nem[nNav].y = MAXY;
         coll_nem[nNav].x = MAXX;
         }
     }
 }
 
-
+/**
+ * @brief Semplice funzione che cancella in uno spazio di 3x4.
+ * 
+ * @param Nav variabile di tipo pos che contiene le coordinate dove effettuare la cancellazione
+ * @param sy variabile utilizzata per indicare una traslazione sull'asse y in cui effettuare la cancellazione
+ * @param i variabile contatore per il ciclo for
+ */
 void Cancella3x4(pos Nav , int sy , int i)
 {
-    for(i=0; i < 5; i++)
+    sy = -1;
+    for(i = 0; i < 5; i++)
         {
             mvprintw(Nav.y+sy-1, Nav.x-1, "    ");
             mvprintw(Nav.y+2, Nav.x-1, "   ");
@@ -652,8 +678,14 @@ void Cancella3x4(pos Nav , int sy , int i)
         }
 }
 
-
-void StampaNavicelle(pos Nav , int sy , int i, int nNav)
+/**
+ * @brief Funzione atta alla stampa degli oggetti Navicella e Navicella nemica in base al loro status
+ * 
+ * @param Nav variabile di tipo pos che contiene le coordinate dove effettuare la stampa
+ * @param sy variabile utilizzata per indicare una traslazione sull'asse y in cui effettuare la stampa
+ * @param i contatore per il ciclo for
+ */
+void StampaNavicelle(pos Nav , int sy , int i)
 {
     char Sprite[3][4];
     switch(Nav.status)

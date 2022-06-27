@@ -1,11 +1,10 @@
 #include "SubroutinesSO.h"
 /**
- * @brief La funzione è atta alla generazione delle coordinate dei nemici e dei loro proiettili. La generazione
- * avviene in base al quante navicelle nemiche vengono richieste in chiamata
+ * @brief Funzione che si occupa della generazione e modifica delle coordinate dei nemici. Inoltre si occupa della generazione dei proiettili nemici
  * 
  * @param pipeout pipe utilizzata per la comunicazione tra processi
  * @param pidNem valore del pid collegato al processo del singolo nemico
- * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e 
+ * @param cont indice dell'array dei nemici utilizzato per tener conto del singolo nemico e per la generazione delle coordinate di esso
  */
 void Nemici(int pipeout , int cont , int column)
 {
@@ -96,10 +95,10 @@ void Nemici(int pipeout , int cont , int column)
 } 
 
 /**
- * @brief 
+ * @brief Funzione che si occupa di generare i proiettili nemici e di modificare le sue coordinate.
  * 
- * @param pipeout 
- * @param nemico 
+ * @param pipeout pipe aperta in scrittura usata per la comunicazione tra processi
+ * @param nemico variabile pos del nemico utilizzata per avere il punto d'origine dello sparo
  */
 int SparoNemici(int pipeout , pos nemico , int column)
 {
@@ -123,7 +122,7 @@ int SparoNemici(int pipeout , pos nemico , int column)
             write(pipeout , &pro_nem , sizeof(pro_nem));
             while(pro_nem.x >= BRDDISTANCE)
             {
-                usleep(25000);
+                usleep(ENEMY_BULLET_SPEED);
                 pro_nem.x--;
                 write(pipeout , &pro_nem , sizeof(pro_nem));
             }

@@ -10,7 +10,6 @@ void main()
     
     
     initscr();
-    //start_color();
     noecho();
     curs_set(false);
     sfondo();
@@ -59,7 +58,7 @@ void main()
                     }
                 }
                 close(tubo[SCRITTURA]);
-                play_again = collision(tubo[LETTURA]);
+                collision(tubo[LETTURA]);
             }
         }
     endwin();
