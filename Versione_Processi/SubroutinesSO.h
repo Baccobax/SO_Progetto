@@ -56,7 +56,6 @@ typedef struct pos {
 
 void sfondo();
 void caricamento();
-void settings();
 void NavicellaGiocatore();
 void Nemici();
 int SparoNemici();
