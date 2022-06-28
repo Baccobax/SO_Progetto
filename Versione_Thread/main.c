@@ -4,7 +4,7 @@
 
 pthread_t threadNemici[NEMICI], threadNavEColl[NAVECOLL] , threadProiettili[PROIETTILI] , threadProiettiliNemici[NEMICI];
 pthread_mutex_t mutex;
-pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su , pos_nemico[NEMICI] , pos_pro_nem[NEMICI/2];
+pos pos_navicella, pos_proiettile , pos_proiettile_giu , pos_proiettile_su , pos_nemico[NEMICI] , pos_pro_nem[NEMICI/2] , buffer_pro_nem[NEMICI/2];
 int cont = 0;
 bool j_pro = false , i_pro = false;
 
@@ -76,7 +76,6 @@ void *NavicellaGiocatore()
     while(true)
     {
         c = getch();
-        timeout(100);
         switch(c)
         {
             case KEY_UP:
@@ -216,6 +215,10 @@ void *Proiettili_giu()
         pthread_mutex_unlock(&mutex);
         usleep(BULLET_SPEED);
     }
+    pthread_mutex_lock(&mutex);
+    pos_proiettile_giu.y = -1;
+    pos_proiettile_giu.x = -1;
+    pthread_mutex_unlock(&mutex);
     usleep(35000);
 }
 
@@ -257,6 +260,10 @@ void *Proiettili_su()
         pthread_mutex_unlock(&mutex);
         usleep(BULLET_SPEED);
     }
+    pthread_mutex_lock(&mutex);
+    pos_proiettile_su.y = -1;
+    pos_proiettile_su.x = -1;
+    pthread_mutex_unlock(&mutex);
     usleep(35000);
 }
 
@@ -281,7 +288,7 @@ void *Nemici(void *contatore)
     my = cont_nemici % column_nem; //variabile utilizzata per impostare di volta in volta in base al loro indice la posizione y dei nemici
 
     pos_nemico[cont_nemici].indice_oggetto = cont_nemici;
-    pos_nemico[cont_nemici].x = MAXX - BRDDISTANCE - ((BRDDISTANCE+1)*mx);
+    pos_nemico[cont_nemici].x = MAXX - BRDDISTANCE-1 - ((BRDDISTANCE+1)*mx);
 
     pthread_mutex_lock(&mutex);
     if(my == 0)
@@ -312,6 +319,7 @@ void *Nemici(void *contatore)
         {
             if((rand() + rand() ) % 2 == 0)
             {    
+                AspettaProiettili();
                 if(pthread_create(&threadProiettiliNemici[cont_nemici], NULL, &SparoNemici, indice_da_passare) != 0)
                 {
                     perror("Failed to create enemy projectile thread");
@@ -387,11 +395,26 @@ void *SparoNemici(void *arg)
             pos_pro_nem[i].status = Proiettile_Morto;
             pos_pro_nem[i].x = -2;
             pthread_mutex_unlock(&mutex);
+            usleep(ENEMY_BULLET_SPEED);
         }
     }
 }
 
-
+/**
+ * @brief Funzione che impone un'attesa nella generazione dei proiettili in base a quanti proiettili sono vivi al momento della chiamata
+ * 
+ */
+void AspettaProiettili()
+{
+    int i;
+    for(i = 0; i < (NEMICI/2)-1 ; i++)
+    {
+        if(pos_pro_nem[i].status == Proiettile)
+        {
+            usleep(ENEMY_BULLET_SPEED);
+        }
+    }
+}
 
 /**
  * @brief Funzione che si occupa delle varie stampe e gestisce le collisioni tra oggetti. Inoltre si occupa di eliminare determinati thread in caso di collisione.
@@ -399,10 +422,10 @@ void *SparoNemici(void *arg)
  */
 void collision()
 {
-    usleep(1000);
+    usleep(1500000);
     curs_set(false);
     pos Nav, proiettile, proiettileGIU , proiettileSU , Nem;
-    int MAXY , MAXX, i, Nem_counter = 0, sy = -1 , nNav = 0 , Nem_life[NEMICI] , Nav_life = 99;
+    int MAXY , MAXX, i, Nem_counter = 0, sy = -1 , nNav = 0 , Nem_life[NEMICI] , Nav_life = 3;
     bool game_over = false, victory = false; 
     getmaxyx(stdscr, MAXY, MAXX);
     Nav.x = -1;
@@ -416,6 +439,8 @@ void collision()
     refresh();
     do
     {
+        border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
+        refresh();
         if(Nav_life == DEATH)
         {
             game_over = true;
@@ -472,26 +497,24 @@ void collision()
         
         //Proiettile nemico
         usleep(1000);
-        
-        for(i=0; i<NEMICI; i++)
+        for(i = 0 ; i < NEMICI/2 ; i++)
         {
-            if (pos_pro_nem[i].x!=pos_nemico[i].x||pos_pro_nem[i].y!=pos_nemico[i].y)
+            if (pos_pro_nem[i].x != pos_nemico[i].x || pos_pro_nem[i].y != pos_nemico[i].y)
             {
                 if(pos_pro_nem[i].x <= MAXX-BRDDISTANCE)
                 {
+                    usleep(1000);
                     mvprintw(pos_pro_nem[i].y , pos_pro_nem[i].x+1 , "     ");
-                    usleep(750);
                     mvaddch(pos_pro_nem[i].y , pos_pro_nem[i].x , pos_pro_nem[i].cp);
                 }
             }
         }
-             
+        
         for(i = 0 ; i < NEMICI ; i++)
         {
-            usleep(750);
             if(pos_pro_nem[i].x <= BRDDISTANCE)
             {
-                mvaddch(pos_pro_nem[i].y , pos_pro_nem[i].x , ' ');                    
+                mvprintw(pos_pro_nem[i].y , pos_pro_nem[i].x-1 , "      ");                    
             }
         }           
         
@@ -500,6 +523,9 @@ void collision()
             usleep(5000);
             if(pos_pro_nem[i].x == Nav.x+1 && (pos_pro_nem[i].y == Nav.y || pos_pro_nem[i].y == Nav.y+1 || pos_pro_nem[i].y == Nav.y-1))
             {
+                clear();
+                flash();
+                refresh();
                 Nav_life--;
                 if(Nav_life < DEATH)
                 {
@@ -512,11 +538,11 @@ void collision()
         usleep(1000);
         if(pos_proiettile.x >= BRDDISTANCE)
         {
-            mvprintw(pos_proiettile.y , pos_proiettile.x-3, "   ");
             usleep(750);
+            mvprintw(pos_proiettile.y , pos_proiettile.x-3, "   ");
             mvaddch(pos_proiettile.y , pos_proiettile.x , pos_proiettile.cp);
         }
-        if(pos_proiettile.x >= MAXX-2)
+        if(pos_proiettile.x >= MAXX-BRDDISTANCE)
         {
             mvaddch(pos_proiettile.y , pos_proiettile.x , ' ');                    
         }
@@ -543,17 +569,16 @@ void collision()
         usleep(1000);
         if(pos_proiettile_giu.x >= BRDDISTANCE)
         {
+            usleep(750);
             for(i = 1 ; i < BRDDISTANCE ; i++)
             {
                 mvaddch(pos_proiettile_giu.y+i , pos_proiettile_giu.x-i, ' ');
                 mvaddch(pos_proiettile_giu.y-i , pos_proiettile_giu.x-i, ' ');
             }
-            usleep(750);
             mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , pos_proiettile_giu.cp);
         }
-        if(pos_proiettile_giu.x >= MAXX-2)
+        if(pos_proiettile_giu.x >= MAXX-BRDDISTANCE)
             {
-                usleep(750);
                 mvaddch(pos_proiettile_giu.y , pos_proiettile_giu.x , ' ');                    
             }
 
@@ -571,7 +596,6 @@ void collision()
                 Cancella3x4(pos_proiettile_giu , sy , i);
                 pos_proiettile_giu.y = -1;
                 pos_proiettile_giu.x = -1;
-                j_pro = false;
             }
         }   
         
@@ -579,15 +603,15 @@ void collision()
         usleep(1000);
         if(pos_proiettile_su.x >= BRDDISTANCE)
         {
+            usleep(750);
             for(i = 1 ; i < BRDDISTANCE ; i++)
             {
                 mvaddch(pos_proiettile_su.y+i , pos_proiettile_su.x-i, ' ');
                 mvaddch(pos_proiettile_su.y-i , pos_proiettile_su.x-i, ' ');
             }
-            usleep(750);
             mvaddch(pos_proiettile_su.y , pos_proiettile_su.x , pos_proiettile_su.cp);
         }
-        if(pos_proiettile_su.x >= MAXX-2)
+        if(pos_proiettile_su.x >= MAXX-BRDDISTANCE)
         {
             mvaddch(pos_proiettile_su.y , pos_proiettile_su.x , ' ');                    
         }
@@ -605,8 +629,11 @@ void collision()
                 Cancella3x4(pos_proiettile_su , sy , i);
                 pos_proiettile_su.y = -1;
                 pos_proiettile_su.x = -1;
-                j_pro = false;
             }
+        }
+        if(pos_proiettile_su.x == -1 && pos_proiettile_giu.x == -1)
+        {
+            j_pro = false;
         }
         border(ACS_VLINE , ACS_VLINE , ACS_HLINE , ACS_HLINE , '*' , '*' , '*' , '*');
         refresh();
@@ -688,6 +715,7 @@ void Cancella3x4(pos Nav , int sy , int i)
 void StampaNavicelle(pos Nav , int sy , int i)
 {
     char Sprite[3][4];
+    int maxy = getmaxy(stdscr);
     switch(Nav.status)
     {
         case(Nav_Alleata):
@@ -696,10 +724,9 @@ void StampaNavicelle(pos Nav , int sy , int i)
             strcpy(Sprite[1], "XXX");
             strcpy(Sprite[2], "XX ");
 
-            for(i=0; i < 5; i++)
+            for(i = 2 ; i < maxy; i++)
             {
-                mvprintw(Nav.y+sy-1, Nav.x, "   ");
-                sy += 1;
+                mvprintw(i, Nav.x, "   ");
             }
             sy=-1;
             for(i=0; i < BRDDISTANCE; i++)

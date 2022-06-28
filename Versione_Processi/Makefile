@@ -1,5 +1,5 @@
-sobaka: main.o menu.o Navicelle.o Nemici.o collision.o
-	cc main.o menu.o Navicelle.o Nemici.o collision.o -lncurses -o sobaka 
+Progetto_Processi: main.o menu.o Navicelle.o Nemici.o collision.o
+	cc main.o menu.o Navicelle.o Nemici.o collision.o -lncurses -o Progetto_Processi
 
 main.o: Navicelle.o Nemici.o SubroutinesSO.h
 	cc -c main.c SubroutinesSO.h
@@ -19,4 +19,4 @@ collision.o: collision.c SubroutinesSO.h
 clean:
 	rm *.o
 	rm *.gch
-	rm sobaka
+	rm Progetto_Processi

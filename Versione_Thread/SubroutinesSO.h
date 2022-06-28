@@ -24,7 +24,7 @@
 #define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
 #define NEMICI 10     //Macro dedicata al numero dei nemici
 #define BULLET_SPEED 95000 //Macro dedicata alla velocita' dei proiettili
-#define ENEMY_BULLET_SPEED 50000 //Macro dedicata alla velocita' dei proiettili dei nemici
+#define ENEMY_BULLET_SPEED 80000 //Macro dedicata alla velocita' dei proiettili dei nemici
 #define ENEMY_SPEED 1500000 //Macro dedicata alla velocita' dei nemici
 #define ENDGAMEWAIT 5000000 //Macro utilizzata per definire la durata della schermata finale
 
@@ -72,3 +72,4 @@ void *Proiettile_dritto();
 void *Proiettili_giu();
 void *Proiettili_su();
 void InizializzaProiettiliNemici();
+void AspettaProiettili();
