@@ -21,7 +21,7 @@
 #define PROIETTILE_IGIU 2 // Macro utilizzata per definire il proiettile che parte verso il basso
 #define BRDDISTANCE 3   //Macro utilizzata per indicare la distanza minima dal bordo
 #define NEMICI 16     //Macro dedicata al numero dei nemici
-#define BULLET_SPEED 10000 //Macro dedicata alla velocita' dei proiettili
+#define BULLET_SPEED 25000 //Macro dedicata alla velocita' dei proiettili
 #define ENEMY_BULLET_SPEED 25000 //Macro dedicata alla velocita' dei proiettili dei nemici
 #define ENEMY_SPEED 500000 //Macro dedicata alla velocita' dei nemici
 #define ENDGAMEWAIT 5000000 //Macro utilizzata per definire la durata della schermata finale
